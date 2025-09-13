@@ -1,0 +1,534 @@
+<% content_for :title, "Search - ShikshaGuru" %>
+
+<div class="container mx-auto px-4 py-8">
+  <!-- Search Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">
+      <%= @search_params[:user_type]&.titleize %> Search
+    </h1>
+    <p class="text-gray-600">
+      <%= @total_count %> <%= @search_params[:user_type]&.pluralize || 'results' %> found
+      <% if @search_params[:query].present? %>
+        for "<span class="font-medium"><%= @search_params[:query] %></span>"
+      <% end %>
+      <% if @search_params[:location].present? %>
+        in <span class="font-medium"><%= @search_params[:location] %></span>
+      <% end %>
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+    <!-- Filters Sidebar -->
+    <div class="lg:col-span-1">
+      <div class="bg-white rounded-lg shadow-md p-6 sticky top-4">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Filters</h2>
+        
+        <%= form_with url: search_path, method: :get, local: false, 
+                      html: { id: 'search-form', class: 'space-y-6' } do |f| %>
+          
+          <!-- Search Query -->
+          <div>
+            <%= f.label :q, "Search", class: "block text-sm font-medium text-gray-700 mb-1" %>
+            <div class="relative">
+              <%= f.text_field :q, 
+                              value: @search_params[:query],
+                              placeholder: "Name, subject, location...",
+                              class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+                              autocomplete: "off",
+                              data: { 
+                                search_target: "input",
+                                action: "input->search#suggest"
+                              } %>
+              <div id="search-suggestions" class="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 shadow-lg hidden"></div>
+            </div>
+          </div>
+
+          <!-- User Type -->
+          <div>
+            <%= f.label :user_type, "Looking for", class: "block text-sm font-medium text-gray-700 mb-1" %>
+            <%= f.select :user_type, 
+                        options_for_select([
+                          ['Teachers', 'teacher'],
+                          ['Students', 'student'],
+                          ['Institutes', 'institute'],
+                          ['All', '']
+                        ], @search_params[:user_type]),
+                        {}, 
+                        { class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" } %>
+          </div>
+
+          <!-- Subjects (Multi-select) -->
+          <div>
+            <%= f.label :subjects, "Subjects", class: "block text-sm font-medium text-gray-700 mb-1" %>
+            <div class="max-h-40 overflow-y-auto border border-gray-300 rounded-md p-2 space-y-1">
+              <% @available_subjects.each do |subject| %>
+                <label class="flex items-center space-x-2 text-sm">
+                  <%= check_box_tag 'subjects[]', subject, 
+                                   (@search_params[:subjects] || []).include?(subject),
+                                   class: "rounded text-blue-600 focus:ring-blue-500" %>
+                  <span><%= subject %></span>
+                </label>
+              <% end %>
+            </div>
+          </div>
+
+          <!-- Rate Range -->
+          <div id="rate-filter" class="<%= 'hidden' unless @search_params[:user_type] == 'teacher' %>">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Hourly Rate (₹)</label>
+            <div class="grid grid-cols-2 gap-2">
+              <%= f.number_field :min_rate, 
+                                placeholder: "Min",
+                                value: @search_params[:min_rate],
+                                class: "px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+              <%= f.number_field :max_rate, 
+                                placeholder: "Max",
+                                value: @search_params[:max_rate],
+                                class: "px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+            </div>
+          </div>
+
+          <!-- Location & Distance -->
+          <div>
+            <%= f.label :location, "Location", class: "block text-sm font-medium text-gray-700 mb-1" %>
+            <%= f.text_field :location, 
+                            value: @search_params[:location],
+                            placeholder: "City name",
+                            class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2" %>
+            
+            <div id="distance-filter" class="<%= 'hidden' if @search_params[:location].blank? %>">
+              <%= f.label :max_distance, "Within (km)", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= f.select :max_distance,
+                          options_for_select([
+                            ['5 km', 5],
+                            ['10 km', 10],
+                            ['25 km', 25],
+                            ['50 km', 50],
+                            ['100 km', 100]
+                          ], @search_params[:max_distance]),
+                          { include_blank: 'Any distance' },
+                          { class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" } %>
+            </div>
+          </div>
+
+          <!-- Teaching Mode -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Teaching Mode</label>
+            <div class="space-y-1">
+              <label class="flex items-center space-x-2 text-sm">
+                <%= f.check_box :online_only, { checked: @search_params[:online_only] }, "true", "" %>
+                <span>Online only</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm">
+                <%= f.check_box :in_person_only, { checked: @search_params[:in_person_only] }, "true", "" %>
+                <span>In-person only</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Experience & Rating -->
+          <div class="space-y-4">
+            <div>
+              <%= f.label :experience_min, "Min Experience (years)", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= f.number_field :experience_min, 
+                                value: @search_params[:experience_min],
+                                min: 0,
+                                class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+            </div>
+            
+            <div>
+              <%= f.label :rating_min, "Min Rating", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= f.select :rating_min,
+                          options_for_select([
+                            ['4+ stars', 4],
+                            ['3+ stars', 3],
+                            ['2+ stars', 2],
+                            ['1+ stars', 1]
+                          ], @search_params[:rating_min]),
+                          { include_blank: 'Any rating' },
+                          { class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" } %>
+            </div>
+          </div>
+
+          <!-- Search Button -->
+          <div class="pt-4">
+            <%= f.submit "Search", 
+                        class: "w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" %>
+          </div>
+
+          <!-- Clear Filters -->
+          <% if @filters_applied %>
+            <div>
+              <%= link_to "Clear all filters", 
+                         search_path, 
+                         class: "w-full block text-center text-sm text-gray-600 hover:text-gray-800 py-2" %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Search Results -->
+    <div class="lg:col-span-3">
+      <!-- Sorting Options -->
+      <div class="flex justify-between items-center mb-6">
+        <div class="flex items-center space-x-4">
+          <%= form_with url: search_path, method: :get, local: false, 
+                        html: { class: 'flex items-center space-x-2' } do |f| %>
+            <!-- Preserve current search params -->
+            <% @search_params.each do |key, value| %>
+              <% next if key == :sort_by %>
+              <% if value.is_a?(Array) %>
+                <% value.each do |v| %>
+                  <%= f.hidden_field key, value: v, multiple: true %>
+                <% end %>
+              <% else %>
+                <%= f.hidden_field key, value: value %>
+              <% end %>
+            <% end %>
+            
+            <%= f.label :sort_by, "Sort by:", class: "text-sm font-medium text-gray-700" %>
+            <%= f.select :sort_by,
+                        options_for_select(@sort_options.map { |k, v| [v, k] }, @search_params[:sort_by]),
+                        {},
+                        { 
+                          class: "px-3 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+                          onchange: "this.form.submit();"
+                        } %>
+          <% end %>
+        </div>
+        
+        <div class="text-sm text-gray-600">
+          Page <%= @pagination[:current_page] %> of <%= @pagination[:total_pages] %>
+        </div>
+      </div>
+
+      <!-- Results Grid -->
+      <div id="search-results" class="space-y-6">
+        <% if @users.present? %>
+          <% @users.each do |user| %>
+            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+              <div class="flex items-start space-x-4">
+                <!-- Profile Picture -->
+                <div class="flex-shrink-0">
+                  <% if user.profile_picture.attached? %>
+                    <%= image_tag user.profile_picture.variant(resize_to_fill: [80, 80, { gravity: 'center' }]),
+                                  class: "w-20 h-20 rounded-full object-cover border-2 border-gray-200" %>
+                  <% else %>
+                    <div class="w-20 h-20 bg-gray-300 rounded-full flex items-center justify-center">
+                      <span class="text-gray-600 text-xl font-bold">
+                        <%= user.name.first.upcase %>
+                      </span>
+                    </div>
+                  <% end %>
+                </div>
+
+                <!-- User Info -->
+                <div class="flex-grow">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <h3 class="text-xl font-semibold text-gray-900">
+                        <%= link_to user.name, user_path(user), 
+                                   class: "hover:text-blue-600 transition-colors" %>
+                      </h3>
+                      <p class="text-sm text-gray-600 mb-1">
+                        <%= user.role.titleize %>
+                        <% if user.location.present? %>
+                          • <%= user.location %>
+                        <% end %>
+                        <% if user.experience_years.present? %>
+                          • <%= user.experience_years %> years experience
+                        <% end %>
+                      </p>
+                      
+                      <!-- Rating -->
+                      <% if user.average_rating.present? && user.total_reviews > 0 %>
+                        <div class="flex items-center mb-2">
+                          <% user.average_rating.times do %>
+                            <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                              <path d="M10 15l-5.878 3.09 1.123-6.545L0 6.91l6.564-.955L10 0l3.436 5.955L20 6.91l-5.245 4.635L16.878 18z"/>
+                            </svg>
+                          <% end %>
+                          <% (5 - user.average_rating).times do %>
+                            <svg class="w-4 h-4 text-gray-300 fill-current" viewBox="0 0 20 20">
+                              <path d="M10 15l-5.878 3.09 1.123-6.545L0 6.91l6.564-.955L10 0l3.436 5.955L20 6.91l-5.245 4.635L16.878 18z"/>
+                            </svg>
+                          <% end %>
+                          <span class="ml-1 text-sm text-gray-600">
+                            (<%= user.total_reviews %> reviews)
+                          </span>
+                        </div>
+                      <% end %>
+                    </div>
+                    
+                    <!-- Rate Range (for teachers) -->
+                    <% if user.teacher? && user.hourly_rate_min.present? %>
+                      <div class="text-right">
+                        <p class="text-lg font-semibold text-green-600">
+                          ₹<%= user.hourly_rate_min %>-<%= user.hourly_rate_max %>/hr
+                        </p>
+                      </div>
+                    <% end %>
+                  </div>
+
+                  <!-- Bio -->
+                  <% if user.bio.present? %>
+                    <p class="text-gray-700 mb-3 line-clamp-2">
+                      <%= user.bio.truncate(150) %>
+                    </p>
+                  <% end %>
+
+                  <!-- Subjects -->
+                  <% if user.preferred_subjects.present? %>
+                    <div class="mb-3">
+                      <div class="flex flex-wrap gap-1">
+                        <% user.preferred_subjects.split(',').map(&:strip).first(4).each do |subject| %>
+                          <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                            <%= subject %>
+                          </span>
+                        <% end %>
+                        <% if user.preferred_subjects.split(',').length > 4 %>
+                          <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                            +<%= user.preferred_subjects.split(',').length - 4 %> more
+                          </span>
+                        <% end %>
+                      </div>
+                    </div>
+                  <% end %>
+
+                  <!-- Teaching Mode -->
+                  <div class="flex items-center space-x-4 text-sm text-gray-600">
+                    <% if user.online_teaching %>
+                      <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M2 3a1 1 0 011-1h14a1 1 0 011 1v11a1 1 0 01-1 1H3a1 1 0 01-1-1V3zm2 10V5h12v8H4z"/>
+                        </svg>
+                        Online
+                      </span>
+                    <% end %>
+                    <% if user.in_person_teaching %>
+                      <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"/>
+                        </svg>
+                        In-person
+                      </span>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="mt-4 flex justify-end space-x-2">
+                <%= link_to "View Profile", 
+                           user_path(user), 
+                           class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm" %>
+                <% if user.teacher? %>
+                  <%= link_to "Contact", 
+                             "#", 
+                             class: "px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors text-sm" %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <!-- No Results -->
+          <div class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No results found</h3>
+            <p class="mt-1 text-sm text-gray-500">
+              Try adjusting your search criteria or filters.
+            </p>
+            <%= link_to "Clear all filters", 
+                       search_path, 
+                       class: "mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-600 bg-blue-100 hover:bg-blue-200" %>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Pagination -->
+      <% if @pagination[:total_pages] > 1 %>
+        <div class="mt-8 flex justify-center">
+          <nav class="flex items-center space-x-2">
+            <!-- Previous Page -->
+            <% if @pagination[:current_page] > 1 %>
+              <%= link_to search_path(@search_params.merge(page: @pagination[:current_page] - 1)), 
+                         class: "px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50" do %>
+                Previous
+              <% end %>
+            <% end %>
+
+            <!-- Page Numbers -->
+            <% page_start = [@pagination[:current_page] - 2, 1].max %>
+            <% page_end = [page_start + 4, @pagination[:total_pages]].min %>
+            <% page_start = [page_end - 4, 1].max if page_end - page_start < 4 %>
+
+            <% (page_start..page_end).each do |page| %>
+              <% if page == @pagination[:current_page] %>
+                <span class="px-3 py-2 bg-blue-600 text-white rounded-md text-sm">
+                  <%= page %>
+                </span>
+              <% else %>
+                <%= link_to page, 
+                           search_path(@search_params.merge(page: page)),
+                           class: "px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50" %>
+              <% end %>
+            <% end %>
+
+            <!-- Next Page -->
+            <% if @pagination[:current_page] < @pagination[:total_pages] %>
+              <%= link_to search_path(@search_params.merge(page: @pagination[:current_page] + 1)), 
+                         class: "px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50" do %>
+                Next
+              <% end %>
+            <% end %>
+          </nav>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- Search JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const searchForm = document.getElementById('search-form');
+  const userTypeSelect = document.querySelector('select[name="user_type"]');
+  const rateFilter = document.getElementById('rate-filter');
+  const locationInput = document.querySelector('input[name="location"]');
+  const distanceFilter = document.getElementById('distance-filter');
+  const searchInput = document.querySelector('input[name="q"]');
+  const suggestionsDiv = document.getElementById('search-suggestions');
+  
+  let suggestionTimeout;
+
+  // Show/hide rate filter based on user type
+  if (userTypeSelect && rateFilter) {
+    userTypeSelect.addEventListener('change', function() {
+      if (this.value === 'teacher') {
+        rateFilter.classList.remove('hidden');
+      } else {
+        rateFilter.classList.add('hidden');
+      }
+    });
+  }
+
+  // Show/hide distance filter based on location
+  if (locationInput && distanceFilter) {
+    locationInput.addEventListener('input', function() {
+      if (this.value.trim()) {
+        distanceFilter.classList.remove('hidden');
+      } else {
+        distanceFilter.classList.add('hidden');
+      }
+    });
+  }
+
+  // Search suggestions
+  if (searchInput && suggestionsDiv) {
+    searchInput.addEventListener('input', function() {
+      const query = this.value.trim();
+      
+      clearTimeout(suggestionTimeout);
+      
+      if (query.length < 2) {
+        suggestionsDiv.classList.add('hidden');
+        return;
+      }
+      
+      suggestionTimeout = setTimeout(() => {
+        fetch(`/search/suggestions?q=${encodeURIComponent(query)}`, {
+          headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        })
+        .then(response => response.json())
+        .then(suggestions => {
+          if (suggestions.length > 0) {
+            suggestionsDiv.innerHTML = suggestions.map(s => 
+              `<div class="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm" data-value="${s.value}" data-type="${s.type}">
+                <span class="text-xs text-gray-500 uppercase">${s.type}</span><br>
+                ${s.label}
+              </div>`
+            ).join('');
+            suggestionsDiv.classList.remove('hidden');
+          } else {
+            suggestionsDiv.classList.add('hidden');
+          }
+        })
+        .catch(() => {
+          suggestionsDiv.classList.add('hidden');
+        });
+      }, 300);
+    });
+
+    // Handle suggestion clicks
+    suggestionsDiv.addEventListener('click', function(e) {
+      const suggestionDiv = e.target.closest('[data-value]');
+      if (suggestionDiv) {
+        const value = suggestionDiv.dataset.value;
+        const type = suggestionDiv.dataset.type;
+        
+        if (type === 'location') {
+          locationInput.value = value;
+          distanceFilter.classList.remove('hidden');
+        } else {
+          searchInput.value = value;
+        }
+        
+        suggestionsDiv.classList.add('hidden');
+      }
+    });
+
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!searchInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+        suggestionsDiv.classList.add('hidden');
+      }
+    });
+  }
+
+  // AJAX form submission
+  if (searchForm) {
+    searchForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const params = new URLSearchParams(formData);
+      
+      // Show loading state
+      const resultsDiv = document.getElementById('search-results');
+      resultsDiv.innerHTML = '<div class="text-center py-8"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div><p class="mt-2 text-gray-600">Searching...</p></div>';
+      
+      fetch(`${this.action}?${params}`, {
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Update URL without page reload
+        const url = new URL(window.location);
+        params.forEach((value, key) => {
+          if (value) {
+            url.searchParams.set(key, value);
+          } else {
+            url.searchParams.delete(key);
+          }
+        });
+        window.history.pushState({}, '', url);
+        
+        // Update results (you would need to render the results here)
+        // For now, just reload the page
+        window.location.reload();
+      })
+      .catch(() => {
+        window.location.reload();
+      });
+    });
+  }
+});
+</script>

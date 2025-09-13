@@ -1,0 +1,82 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-4xl mx-auto">
+    <div class="flex items-center justify-between mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">My Chats</h1>
+      <div class="text-sm text-gray-600">
+        <%= pluralize(@chat_rooms.count, 'conversation') %>
+      </div>
+    </div>
+
+    <% if @chat_rooms.any? %>
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <% @chat_rooms.each do |chat_room| %>
+          <div class="border-b border-gray-200 last:border-b-0">
+            <%= link_to chat_room_path(chat_room), class: "block p-6 hover:bg-gray-50 transition-colors" do %>
+              <div class="flex items-center justify-between">
+                <div class="flex-1">
+                  <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                    <%= chat_room.name %>
+                  </h3>
+                  
+                  <div class="flex items-center space-x-4 text-sm text-gray-600">
+                    <div class="flex items-center">
+                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                      </svg>
+                      <%= pluralize(chat_room.participants.count, 'participant') %>
+                    </div>
+                    
+                    <% if chat_room.job_request %>
+                      <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2h8z"></path>
+                        </svg>
+                        Job: <%= chat_room.job_request.subject %>
+                      </div>
+                    <% end %>
+                  </div>
+                  
+                  <% if chat_room.messages.any? %>
+                    <% last_message = chat_room.messages.order(:created_at).last %>
+                    <p class="text-sm text-gray-500 mt-2 truncate">
+                      <span class="font-medium"><%= last_message.user.name %>:</span>
+                      <%= last_message.content %>
+                    </p>
+                    <p class="text-xs text-gray-400 mt-1">
+                      <%= time_ago_in_words(last_message.created_at) %> ago
+                    </p>
+                  <% else %>
+                    <p class="text-sm text-gray-500 mt-2 italic">No messages yet</p>
+                  <% end %>
+                </div>
+                
+                <div class="flex-shrink-0 ml-4">
+                  <% if chat_room.is_active %>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Active
+                    </span>
+                  <% else %>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      Inactive
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="text-center py-12">
+        <div class="mx-auto h-24 w-24 text-gray-400 mb-4">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No conversations yet</h3>
+        <p class="text-gray-600 mb-4">Start chatting by applying to job requests or posting your own requirements.</p>
+        <%= link_to "Browse Job Requests", job_requests_path, class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

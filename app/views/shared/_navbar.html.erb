@@ -1,0 +1,120 @@
+<div class="navbar bg-base-100 border-b shadow-sm px-4">
+  <div class="navbar-start">
+    <%= link_to root_path, class: "btn btn-ghost normal-case text-xl" do %>
+      <span class="text-primary font-bold">शिक्षा</span>
+      <span class="text-secondary font-bold">Guru</span>
+    <% end %>
+  </div>
+  
+  <div class="navbar-center hidden lg:flex">
+    <ul class="menu menu-horizontal px-1">
+      <% if user_signed_in? %>
+        <%= link_to "Job Requests", job_requests_path, class: "btn btn-ghost" %>
+        <%= link_to "My Chats", chat_rooms_path, class: "btn btn-ghost relative" do %>
+          Messages
+          <% if Current.user.unread_messages_count > 0 %>
+            <span class="badge badge-primary badge-sm absolute -top-2 -right-2"><%= Current.user.unread_messages_count %></span>
+          <% end %>
+        <% end %>
+        <div class="dropdown dropdown-hover">
+          <label tabindex="0" class="btn btn-ghost">Search</label>
+          <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+            <li><%= link_to "Find Teachers", search_path(user_type: 'teacher') %></li>
+            <li><%= link_to "Find Students", search_path(user_type: 'student') %></li>
+            <li><%= link_to "Find Institutes", search_path(user_type: 'institute') %></li>
+            <li><%= link_to "Advanced Search", search_path %></li>
+          </ul>
+        </div>
+      <% else %>
+        <div class="dropdown dropdown-hover">
+          <label tabindex="0" class="btn btn-ghost">Search</label>
+          <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+            <li><%= link_to "Find Teachers", search_path(user_type: 'teacher') %></li>
+            <li><%= link_to "Find Students", search_path(user_type: 'student') %></li>
+            <li><%= link_to "Find Institutes", search_path(user_type: 'institute') %></li>
+            <li><%= link_to "Advanced Search", search_path %></li>
+          </ul>
+        </div>
+      <% end %>
+      <%= link_to "Blog", blog_index_path, class: "btn btn-ghost" %>
+      <li><a href="#about" class="btn btn-ghost">About</a></li>
+      <li><a href="#contact" class="btn btn-ghost">Contact</a></li>
+    </ul>
+  </div>
+  
+  <div class="navbar-end">
+    <% if user_signed_in? %>
+      <div class="dropdown dropdown-end">
+        <label tabindex="0" class="btn btn-ghost btn-circle avatar">
+          <div class="w-10 rounded-full">
+            <% if Current.user.profile_picture.attached? %>
+              <%= image_tag Current.user.profile_picture.variant(resize_to_fill: [40, 40, { gravity: 'center' }]), 
+                           alt: Current.user.display_name, 
+                           class: "w-10 h-10 rounded-full object-cover" %>
+            <% else %>
+              <div class="bg-neutral text-neutral-content rounded-full w-10 h-10 flex items-center justify-center">
+                <%= Current.user.display_name.first.upcase %>
+              </div>
+            <% end %>
+          </div>
+        </label>
+        <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+          <li>
+            <a href="<%= profile_path %>" class="justify-between">
+              Profile
+              <span class="badge badge-<%= Current.user.role %>"><%= Current.user.role.titleize %></span>
+            </a>
+          </li>
+          <li><a href="<%= profile_path %>">Settings</a></li>
+          <li>
+            <a href="#" onclick="openThemeModal()" class="flex items-center">
+              <span class="mr-2">🎨</span> Theme
+            </a>
+          </li>
+          <li><%= link_to "Sign out", sign_out_path, method: :delete %></li>
+        </ul>
+      </div>
+    <% else %>
+      <div class="space-x-2 flex items-center">
+        <!-- Theme button for non-logged-in users -->
+        <button onclick="openThemeModal()" class="btn btn-ghost btn-circle" title="Change Theme">
+          🎨
+        </button>
+        <%= link_to "Sign In", sign_in_path, class: "btn btn-ghost" %>
+        <%= link_to "Sign Up", sign_up_path, class: "btn btn-primary" %>
+      </div>
+    <% end %>
+    
+    <!-- Mobile menu -->
+    <div class="dropdown lg:hidden">
+      <label tabindex="0" class="btn btn-ghost btn-circle">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </label>
+      <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+        <% if user_signed_in? %>
+          <li><%= link_to "Job Requests", job_requests_path %></li>
+          <li>
+            <%= link_to chat_rooms_path, class: "flex justify-between" do %>
+              My Chats
+              <% if Current.user.unread_messages_count > 0 %>
+                <span class="badge badge-primary badge-sm"><%= Current.user.unread_messages_count %></span>
+              <% end %>
+            <% end %>
+          </li>
+          <li><%= link_to "Find Teachers", search_path(user_type: 'teacher') %></li>
+          <li><%= link_to "Find Students", search_path(user_type: 'student') %></li>
+          <li><%= link_to "Find Institutes", search_path(user_type: 'institute') %></li>
+        <% else %>
+          <li><%= link_to "Find Teachers", search_path(user_type: 'teacher') %></li>
+          <li><%= link_to "Find Students", search_path(user_type: 'student') %></li>
+          <li><%= link_to "Find Institutes", search_path(user_type: 'institute') %></li>
+        <% end %>
+        <li><%= link_to "Blog", blog_index_path %></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="cleartype" content="on">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <% if content_for?(:title) %>
+      <title><%= format("%s - Dashboard", yield(:title)) %></title>
+    <% else %>
+      <title>Admin Dashboard</title>
+    <% end %>
+    <%= csrf_meta_tags %>
+    <%= action_cable_meta_tag %>
+    <%= content_for?(:head) ? yield(:head) : '' %>
+    <%= stylesheet_link_tag 'admin', media: 'all' %>
+    <%= javascript_include_tag 'admin', type: "module" %>
+    <%= favicon_link_tag asset_path("app-favicon.svg") %>
+    <script>
+      // 防止主题闪烁 - 与 admin.js 逻辑保持一致
+      (function() {
+        const isDarkKey = 'admin-isdark';
+        const savedIsDark = JSON.parse(localStorage.getItem(isDarkKey) || 'false');
+        document.documentElement.setAttribute('data-theme', savedIsDark ? 'dark' : 'light');
+      })();
+    </script>
+  </head>
+  <body class="<%= body_class %>">
+    <%- if @full_render %>
+      <%= yield %>
+    <%- else %>
+      <div class="drawer lg:drawer-open">
+        <input id="drawer-toggle" type="checkbox" class="drawer-toggle" />
+
+        <!-- Main content -->
+        <div class="drawer-content flex flex-col">
+          <%= render 'shared/admin/header' %>
+
+          <main class="flex-1 p-6 bg-base-200">
+            <div class="max-w-7xl mx-auto">
+              <%= render 'shared/flash_messages' %>
+              <%= yield %>
+            </div>
+          </main>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="drawer-side">
+          <label for="drawer-toggle" aria-label="close sidebar" class="drawer-overlay"></label>
+          <aside class="menu bg-base-300 text-base-content min-h-full w-80 p-4">
+            <!-- Sidebar Header -->
+            <div class="flex items-center gap-2 px-4 py-2 mb-4">
+              <%= link_to admin_root_path, class: "flex items-center gap-3" do %>
+                <div class="avatar placeholder">
+                  <div class="bg-primary text-primary-content w-10 rounded-lg">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+                    </svg>
+                  </div>
+                </div>
+                <span class="text-xl font-bold">Admin Dashboard</span>
+              <% end %>
+            </div>
+
+            <div class="divider">MENU</div>
+
+            <%= render 'shared/admin/sidebar' %>
+
+            <div class="divider">SYSTEM</div>
+            <li>
+              <%= link_to admin_administrators_path,
+                  class: "#{'active' if current_path.include?('/admin/administrators')}" do %>
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
+                </svg>
+                Administrators
+              <% end %>
+            </li>
+            <!-- Job Queue -->
+            <li>
+              <%= link_to admin_good_job_path, target: '_blank',
+                  class: "#{current_path.include?('/admin/good_job') ? 'active' : ''}" do %>
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                </svg>
+                Job Queue
+                <svg class="w-4 h-4 ml-auto opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                </svg>
+              <% end %>
+            </li>
+          </aside>
+        </div>
+      </div>
+    <%- end %>
+  </body>
+</html>

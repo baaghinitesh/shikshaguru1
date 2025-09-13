@@ -1,0 +1,66 @@
+### Startup Command:
+
+bin/dev (Do not use `rails s` directly, as it may cause js/css loading issues)
+
+### The project uses the following tech stack:
+
+Ruby on Rails 7.2
+daisyUI 4( with tailwind 3 )
+Figaro
+PostgreSQL
+Active_Storage for upload file
+Kaminari
+Puma
+RSpec
+
+Do not add or remove any components and avoid upgrading or downgrading components lightly.
+
+## When you should restart project
+
+In most cases, restarting project is unnecessary because Rails automatically hot-reloads code changes. However, changes to files within the `config/` directory (except `config/routes.rb`), including updates to configurations like `config/application.yml`, explicitly require a project restart.
+
+## Initialize project tips
+
+During the system initialization process, you should prioritize creating a beautiful home page that does not require login. Once completed, directly run the project
+
+### Some import tips when Developing user authentication/payment/LLM-calling(AI APP) system
+
+When you need to register/authentication system, don't write it yourself. Use `rails generate authentication` generate it first.
+
+During the system initialization process, you should prioritize creating a beautiful home page that does not require login. Once completed, directly run the project
+
+when developing order/payment system, don't write it yourself. Use `rails generate stripe_pay` to generate it first.
+
+Should only need to support Stripe payments by default.
+
+LLM calling feature should support SSE streaming output by default.
+
+### Some important tips when coding
+
+Do not generate any fake data that should originally be in the database for users.
+
+Do not write any business logic in the admin backend that should only be for website management and maintenance.
+
+Generate images using this placeholder website: https://images.unsplash.com/ and simultaneously verify accessibility with `curl` if you need static assets.
+
+Use `rails generate service xxx` to generate a service file, not generate by yourself.
+
+When installing libraries, try to specify the version you are most familiar with (e.g., npm, bundle) instead of the latest version.
+
+Always keep UI responsiveness in mind when coding for user interfaces.
+
+Use `rails generate admin_crud xxx` (where xxx is your model name that you created before) to create the initial CRUD when developing the admin management page
+
+Use `rails generate crud xxx [action1] [action2]` (where xxx is your model name that you created before, action is optional(all actions by default)) to create the initial CRUD when developing the user-side functionality
+
+Do not use `to_param` in model, no need friendly url.
+
+Use `curl` for testing url accessibility, Especially focus on testing the homepage after login.
+
+Do not use `rails console`, use `rails runner` instead if you want insert or check db data.
+
+Write test file in `tmp/`.
+
+### Some files never edit
+
+Never edit `application.html.erb`, update `_navbar.html.erb` instead if need add navbar.

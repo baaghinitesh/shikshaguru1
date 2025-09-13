@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="cleartype" content="on">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <title>
+      <% if content_for?(:title) %>
+        <%= yield(:title) + ENV['APPNAME'] || 'ClackyAI APP' %>
+      <% elsif @meta_tags && @meta_tags[:title] %>
+        <%= @meta_tags[:title] %> - <%= ENV['APPNAME'] || 'ShikshaGuru' %>
+      <% else %>
+        <%= ENV['APPNAME'] || 'ClackyAI APP' %>
+      <% end %>
+    </title>
+    <%= csrf_meta_tags %>
+    <%= action_cable_meta_tag %>
+    
+    <!-- Blog Meta Tags -->
+    <% if respond_to?(:render_meta_tags) %>
+      <%= render_meta_tags %>
+    <% end %>
+    <%= content_for?(:head) ? yield(:head) : '' %>
+    <%= stylesheet_link_tag 'application', media: 'all' %>
+    <%= javascript_include_tag 'application', type: "module" %>
+    
+    <!-- Theme Custom CSS -->
+    <style id="custom-theme-css">
+      <%= custom_theme_css.html_safe %>
+    </style>
+    
+    <!-- JSON-LD Structured Data -->
+    <% if respond_to?(:render_json_ld) %>
+      <%= render_json_ld %>
+    <% end %>
+    
+    <!-- Generate new favicon at `images/app-favicon.svg` at the first time, remove this line after generated  -->
+    <%= favicon_link_tag asset_path("app-favicon.svg") %>
+  </head>
+  <body class="<%= body_class %>" data-theme="<%= theme_data_attribute %>">
+    <main class="min-h-screen">
+      <%= render 'shared/navbar' %>
+      <%= render 'shared/flash_messages' %>
+      <%= yield %>
+      
+      <!-- Theme Modal -->
+      <%= render 'shared/theme_modal' %>
+    </main>
+  </body>
+</html>
