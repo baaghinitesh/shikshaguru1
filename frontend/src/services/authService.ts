@@ -1,15 +1,33 @@
 import axios from 'axios';
 import type { User, ApiResponse, LoginFormData, RegisterFormData } from '@/types';
+import { API_BASE_URL, testApiConnectivity } from '@/config/api';
 
 // Create axios instance with base configuration
+let currentApiUrl = API_BASE_URL;
+
 const api = axios.create({
-  baseURL: window.location.hostname === 'localhost' 
-    ? 'http://localhost:5001/api'
-    : `http://${window.location.hostname}:5001/api`,
+  baseURL: currentApiUrl,
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+// Function to update API base URL dynamically
+const updateApiBaseUrl = async () => {
+  try {
+    const workingUrl = await testApiConnectivity();
+    if (workingUrl !== currentApiUrl) {
+      currentApiUrl = workingUrl;
+      api.defaults.baseURL = workingUrl;
+      console.log('🔄 Updated API base URL to:', workingUrl);
+    }
+  } catch (error) {
+    console.error('❌ Failed to find working API URL:', error);
+  }
+};
+
+// Test connectivity on service initialization
+updateApiBaseUrl();
 
 // Request interceptor to add auth token
 api.interceptors.request.use(
@@ -38,9 +56,7 @@ api.interceptors.response.use(
         const refreshToken = localStorage.getItem('refreshToken');
         if (refreshToken) {
           const response = await axios.post(
-            window.location.hostname === 'localhost' 
-              ? 'http://localhost:5001/api/auth/refresh-token'
-              : `http://${window.location.hostname}:5001/api/auth/refresh-token`, {
+            `${API_BASE_URL}/auth/refresh-token`, {
             refreshToken,
           });
           
@@ -89,13 +105,28 @@ class AuthService {
    * Register a new user
    */
   async register(data: RegisterFormData): Promise<AuthResponse> {
+    console.log('🚀 Starting registration process');
+    console.log('📊 Registration data:', { ...data, password: '[HIDDEN]' });
+    console.log('🌐 Current API base URL:', api.defaults.baseURL);
+    
     try {
-      const response = await api.post<ApiResponse<AuthResponse>>('/auth/register', {
+      // Ensure we have the best API URL before making request
+      await updateApiBaseUrl();
+      console.log('✅ API URL confirmed:', api.defaults.baseURL);
+      
+      const requestPayload = {
         name: data.name,
         email: data.email,
         password: data.password,
         role: data.role,
-      });
+      };
+      
+      console.log('📤 Sending registration request to:', api.defaults.baseURL + '/auth/register');
+      
+      const response = await api.post<ApiResponse<AuthResponse>>('/auth/register', requestPayload);
+      
+      console.log('📥 Registration response status:', response.status);
+      console.log('📊 Registration response data:', response.data);
 
       if (response.data.success && response.data.data) {
         const { accessToken, refreshToken } = response.data.data;
@@ -104,11 +135,48 @@ class AuthService {
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
         
+        console.log('✅ Registration successful, tokens stored');
         return response.data.data;
       } else {
+        console.error('❌ Registration failed:', response.data.message);
         throw new Error(response.data.message || 'Registration failed');
       }
     } catch (error: any) {
+      console.error('💥 Registration error:', error);
+      console.error('🔍 Error details:', {
+        message: error.message,
+        code: error.code,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      
+      // If network error, try to find working API URL and retry
+      if (error.code === 'NETWORK_ERROR' || error.message.includes('Network Error')) {
+        console.log('🔄 Network error detected, trying to find working API URL...');
+        await updateApiBaseUrl();
+        
+        // Retry once with new URL
+        try {
+          console.log('🔄 Retrying registration with URL:', api.defaults.baseURL);
+          const retryResponse = await api.post<ApiResponse<AuthResponse>>('/auth/register', {
+            name: data.name,
+            email: data.email,
+            password: data.password,
+            role: data.role,
+          });
+          
+          if (retryResponse.data.success && retryResponse.data.data) {
+            const { accessToken, refreshToken } = retryResponse.data.data;
+            localStorage.setItem('accessToken', accessToken);
+            localStorage.setItem('refreshToken', refreshToken);
+            console.log('✅ Registration successful on retry');
+            return retryResponse.data.data;
+          }
+        } catch (retryError: any) {
+          console.error('💥 Retry also failed:', retryError);
+        }
+      }
+      
       if (error.response?.data?.message) {
         throw new Error(error.response.data.message);
       } else if (error.message) {
@@ -123,11 +191,26 @@ class AuthService {
    * Login a user
    */
   async login(data: LoginFormData): Promise<AuthResponse> {
+    console.log('🚀 Starting login process');
+    console.log('📊 Login data:', { ...data, password: '[HIDDEN]' });
+    console.log('🌐 Current API base URL:', api.defaults.baseURL);
+    
     try {
-      const response = await api.post<ApiResponse<AuthResponse>>('/auth/login', {
+      // Ensure we have the best API URL before making request
+      await updateApiBaseUrl();
+      console.log('✅ API URL confirmed:', api.defaults.baseURL);
+      
+      const requestPayload = {
         email: data.email,
         password: data.password,
-      });
+      };
+      
+      console.log('📤 Sending login request to:', api.defaults.baseURL + '/auth/login');
+      
+      const response = await api.post<ApiResponse<AuthResponse>>('/auth/login', requestPayload);
+      
+      console.log('📥 Login response status:', response.status);
+      console.log('📊 Login response data:', response.data);
 
       if (response.data.success && response.data.data) {
         const { accessToken, refreshToken } = response.data.data;
@@ -136,11 +219,46 @@ class AuthService {
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
         
+        console.log('✅ Login successful, tokens stored');
         return response.data.data;
       } else {
+        console.error('❌ Login failed:', response.data.message);
         throw new Error(response.data.message || 'Login failed');
       }
     } catch (error: any) {
+      console.error('💥 Login error:', error);
+      console.error('🔍 Error details:', {
+        message: error.message,
+        code: error.code,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      
+      // If network error, try to find working API URL and retry
+      if (error.code === 'NETWORK_ERROR' || error.message.includes('Network Error')) {
+        console.log('🔄 Network error detected, trying to find working API URL...');
+        await updateApiBaseUrl();
+        
+        // Retry once with new URL
+        try {
+          console.log('🔄 Retrying login with URL:', api.defaults.baseURL);
+          const retryResponse = await api.post<ApiResponse<AuthResponse>>('/auth/login', {
+            email: data.email,
+            password: data.password,
+          });
+          
+          if (retryResponse.data.success && retryResponse.data.data) {
+            const { accessToken, refreshToken } = retryResponse.data.data;
+            localStorage.setItem('accessToken', accessToken);
+            localStorage.setItem('refreshToken', refreshToken);
+            console.log('✅ Login successful on retry');
+            return retryResponse.data.data;
+          }
+        } catch (retryError: any) {
+          console.error('💥 Retry also failed:', retryError);
+        }
+      }
+      
       if (error.response?.data?.message) {
         throw new Error(error.response.data.message);
       } else if (error.message) {
@@ -208,9 +326,7 @@ class AuthService {
       }
 
       const response = await axios.post<ApiResponse<{ accessToken: string }>>(
-        window.location.hostname === 'localhost' 
-          ? 'http://localhost:5001/api/auth/refresh-token'
-          : `http://${window.location.hostname}:5001/api/auth/refresh-token`,
+        `${API_BASE_URL}/auth/refresh-token`,
         { refreshToken }
       );
 

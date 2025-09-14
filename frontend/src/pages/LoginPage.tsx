@@ -1,11 +1,12 @@
 import React from 'react';
 import { BookOpen } from 'lucide-react';
 import LoginForm from '@/components/auth/LoginForm';
+import ApiTest from '@/components/debug/ApiTest';
 
 const LoginPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-accent-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+      <div className="max-w-6xl w-full space-y-8">
         {/* Logo and Header */}
         <div className="text-center">
           <div className="flex items-center justify-center mb-6">
@@ -16,8 +17,11 @@ const LoginPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Login Form */}
-        <LoginForm />
+        {/* Login Form and Debug */}
+        <div className="grid md:grid-cols-2 gap-8">
+          <LoginForm />
+          <ApiTest />
+        </div>
       </div>
     </div>
   );
