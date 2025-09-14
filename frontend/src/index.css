@@ -1,238 +1,288 @@
-/* Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Base Styles */
-@layer base {
-  html {
-    @apply scroll-smooth;
-  }
-  
-  body {
-    @apply font-sans text-gray-900 bg-white dark:text-gray-100 dark:bg-gray-900;
-    @apply transition-colors duration-300;
-  }
-  
-  * {
-    @apply border-gray-200 dark:border-gray-700;
-  }
-}
-
-/* Component Styles */
-@layer components {
-  /* Button Components */
-  .btn {
-    @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg;
-    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200;
-    @apply disabled:opacity-50 disabled:cursor-not-allowed;
-  }
-  
-  .btn-primary {
-    @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
-    @apply dark:bg-primary-500 dark:hover:bg-primary-600;
-  }
-  
-  .btn-secondary {
-    @apply bg-secondary-600 text-white hover:bg-secondary-700 focus:ring-secondary-500;
-    @apply dark:bg-secondary-500 dark:hover:bg-secondary-600;
-  }
-  
-  .btn-outline {
-    @apply border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-primary-500;
-    @apply dark:border-gray-600 dark:text-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700;
-  }
-  
-  .btn-ghost {
-    @apply text-gray-700 hover:bg-gray-100 focus:ring-primary-500;
-    @apply dark:text-gray-300 dark:hover:bg-gray-800;
-  }
-  
-  /* Card Components */
-  .card {
-    @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700;
-    @apply transition-all duration-200;
-  }
-  
-  .card-hover {
-    @apply hover:shadow-xl hover:-translate-y-1;
-  }
-  
-  /* Input Components */
-  .input {
-    @apply block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm;
-    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
-    @apply dark:border-gray-600 dark:bg-gray-700 dark:text-white;
-    @apply placeholder-gray-400 dark:placeholder-gray-500;
-    @apply transition-all duration-200;
-  }
-  
-  .input-error {
-    @apply border-red-300 focus:ring-red-500;
-    @apply dark:border-red-600;
-  }
-  
-  /* Navigation Components */
-  .nav-link {
-    @apply px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200;
-    @apply text-gray-600 hover:text-gray-900 hover:bg-gray-100;
-    @apply dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800;
-  }
-  
-  .nav-link-active {
-    @apply text-primary-600 bg-primary-50 dark:text-primary-400 dark:bg-primary-900/30;
-  }
-  
-  /* Badge Components */
-  .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-  }
-  
-  .badge-primary {
-    @apply bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200;
-  }
-  
-  .badge-success {
-    @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200;
-  }
-  
-  .badge-warning {
-    @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200;
-  }
-  
-  .badge-error {
-    @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200;
-  }
-  
-  /* Loading Components */
-  .spinner {
-    @apply animate-spin rounded-full border-2 border-gray-300 border-t-primary-600;
-  }
-  
-  /* Modal Components */
-  .modal-overlay {
-    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50;
-    @apply animate-fade-in;
-  }
-  
-  .modal-content {
-    @apply bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full;
-    @apply animate-scale-in;
-  }
-  
-  /* Theme Toggle Components */
-  .theme-toggle {
-    @apply relative inline-flex h-6 w-11 items-center rounded-full;
-    @apply bg-gray-200 dark:bg-gray-700 transition-colors duration-200;
-  }
-  
-  .theme-toggle-slider {
-    @apply inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200;
-    @apply translate-x-1 dark:translate-x-6;
-  }
-}
-
-/* Utility Classes */
-@layer utilities {
-  /* Scrollbar Styling */
-  .scrollbar-thin {
-    scrollbar-width: thin;
-    scrollbar-color: theme('colors.gray.400') theme('colors.gray.100');
-  }
-  
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  .scrollbar-thin::-webkit-scrollbar-track {
-    @apply bg-gray-100 dark:bg-gray-800;
-  }
-  
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    @apply bg-gray-400 dark:bg-gray-600 rounded-full;
-  }
-  
-  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-500 dark:bg-gray-500;
-  }
-  
-  /* Text Utilities */
-  .text-gradient {
-    @apply bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent;
-  }
-  
-  /* Animation Utilities */
-  .animate-pulse-slow {
-    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-  
-  /* Mobile-first responsive utilities */
-  .mobile-menu-closed {
-    transform: translateX(-100%);
-  }
-  
-  .mobile-menu-open {
-    transform: translateX(0);
-  }
-}
-
-/* Custom CSS Variables for Dynamic Theming */
+/* Theme Variables - These actually control the app appearance */
 :root {
-  --color-primary: theme('colors.primary.500');
-  --color-secondary: theme('colors.secondary.500');
-  --color-accent: theme('colors.accent.500');
-  --color-background: theme('colors.white');
-  --color-surface: theme('colors.gray.50');
-  --color-text: theme('colors.gray.900');
-  --color-text-secondary: theme('colors.gray.600');
-}
-
-[data-theme="dark"] {
-  --color-background: theme('colors.gray.900');
-  --color-surface: theme('colors.gray.800');
-  --color-text: theme('colors.gray.100');
-  --color-text-secondary: theme('colors.gray.300');
-}
-
-/* Custom theme classes that will be dynamically applied */
-.theme-ocean {
-  --color-primary: #0891b2;
-  --color-secondary: #0e7490;
-  --color-accent: #06b6d4;
-}
-
-.theme-sunset {
-  --color-primary: #ea580c;
-  --color-secondary: #dc2626;
+  /* Default light theme */
+  --color-primary: #3b82f6;
+  --color-secondary: #6b7280;
   --color-accent: #f59e0b;
+  --color-background: #ffffff;
+  --color-text: #111827;
+  
+  /* Font settings */
+  --font-size-base: 16px;
+  --font-family-primary: 'Inter', sans-serif;
+  
+  /* Derived colors for UI elements */
+  --color-surface: #f9fafb;
+  --color-border: #e5e7eb;
+  --color-muted: #6b7280;
+  --color-error: #ef4444;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
 }
 
-.theme-forest {
+/* Theme Classes - Applied by ThemeContext */
+.theme-light {
+  --color-primary: #3b82f6;
+  --color-secondary: #6b7280;
+  --color-accent: #f59e0b;
+  --color-background: #ffffff;
+  --color-text: #111827;
+  --color-surface: #f9fafb;
+  --color-border: #e5e7eb;
+  --color-muted: #6b7280;
+}
+
+.theme-dark {
+  --color-primary: #60a5fa;
+  --color-secondary: #9ca3af;
+  --color-accent: #fbbf24;
+  --color-background: #111827;
+  --color-text: #f9fafb;
+  --color-surface: #1f2937;
+  --color-border: #374151;
+  --color-muted: #9ca3af;
+}
+
+.theme-blue {
+  --color-primary: #2563eb;
+  --color-secondary: #64748b;
+  --color-accent: #0ea5e9;
+  --color-background: #f8fafc;
+  --color-text: #0f172a;
+  --color-surface: #f1f5f9;
+  --color-border: #cbd5e1;
+  --color-muted: #64748b;
+}
+
+.theme-green {
   --color-primary: #059669;
-  --color-secondary: #047857;
+  --color-secondary: #6b7280;
   --color-accent: #10b981;
+  --color-background: #f0fdf4;
+  --color-text: #064e3b;
+  --color-surface: #ecfdf5;
+  --color-border: #a7f3d0;
+  --color-muted: #6b7280;
+}
+
+.theme-red {
+  --color-primary: #dc2626;
+  --color-secondary: #6b7280;
+  --color-accent: #f59e0b;
+  --color-background: #fef2f2;
+  --color-text: #7f1d1d;
+  --color-surface: #fef2f2;
+  --color-border: #fecaca;
+  --color-muted: #6b7280;
 }
 
 .theme-purple {
   --color-primary: #7c3aed;
-  --color-secondary: #6d28d9;
-  --color-accent: #8b5cf6;
+  --color-secondary: #6b7280;
+  --color-accent: #a855f7;
+  --color-background: #faf5ff;
+  --color-text: #581c87;
+  --color-surface: #f3e8ff;
+  --color-border: #c084fc;
+  --color-muted: #6b7280;
 }
+
+/* Base Styles */
+html {
+  font-size: var(--font-size-base, 16px);
+  font-family: var(--font-family-primary, 'Inter', sans-serif);
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Apply theme colors to all major UI elements */
+@layer base {
+  /* Update Tailwind's color system to use our theme variables */
+  .bg-white { @apply bg-[var(--color-background)]; }
+  .bg-gray-50 { @apply bg-[var(--color-surface)]; }
+  .bg-gray-100 { @apply bg-[var(--color-surface)]; }
+  
+  .text-gray-900 { @apply text-[var(--color-text)]; }
+  .text-gray-700 { @apply text-[var(--color-text)]; }
+  .text-gray-600 { @apply text-[var(--color-muted)]; }
+  
+  .border-gray-200 { @apply border-[var(--color-border)]; }
+  .border-gray-300 { @apply border-[var(--color-border)]; }
+  
+  /* Primary color overrides */
+  .bg-blue-600 { @apply bg-[var(--color-primary)]; }
+  .bg-primary-600 { @apply bg-[var(--color-primary)]; }
+  .text-blue-600 { @apply text-[var(--color-primary)]; }
+  .text-primary-600 { @apply text-[var(--color-primary)]; }
+  .border-blue-600 { @apply border-[var(--color-primary)]; }
+  .border-primary-600 { @apply border-[var(--color-primary)]; }
+}
+
+@layer components {
+  /* Button components that adapt to theme */
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    --focus-ring-color: var(--color-primary);
+  }
+  
+  .btn-primary {
+    background-color: var(--color-primary);
+    color: var(--color-background);
+  }
+  
+  .btn-primary:hover:not(:disabled) {
+    filter: brightness(110%);
+  }
+  
+  .btn-secondary {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+  }
+  
+  .btn-secondary:hover:not(:disabled) {
+    background-color: var(--color-border);
+  }
+  
+  .btn-outline {
+    background-color: transparent;
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+  }
+  
+  .btn-outline:hover:not(:disabled) {
+    background-color: var(--color-primary);
+    color: var(--color-background);
+  }
+  
+  .btn-ghost {
+    background-color: transparent;
+    color: var(--color-text);
+  }
+  
+  .btn-ghost:hover:not(:disabled) {
+    background-color: var(--color-surface);
+  }
+  
+  /* Input components */
+  .input {
+    @apply w-full px-3 py-2 rounded-md border transition-colors;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    border-color: var(--color-border);
+  }
+  
+  .input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary), 0.1);
+  }
+  
+  /* Card components */
+  .card {
+    @apply rounded-lg shadow-sm border p-6;
+    background-color: var(--color-background);
+    border-color: var(--color-border);
+  }
+  
+  /* Navigation components */
+  .nav-link {
+    @apply px-3 py-2 rounded-md transition-colors;
+    color: var(--color-text);
+  }
+  
+  .nav-link:hover {
+    background-color: var(--color-surface);
+  }
+  
+  .nav-link.active {
+    background-color: var(--color-primary);
+    color: var(--color-background);
+  }
+  
+  /* Header/Navigation styling */
+  .header {
+    @apply shadow-sm border-b;
+    background-color: var(--color-background);
+    border-color: var(--color-border);
+  }
+  
+  /* Modal styling */
+  .modal-overlay {
+    @apply fixed inset-0 bg-black bg-opacity-50;
+  }
+  
+  .modal-content {
+    @apply rounded-lg shadow-xl border;
+    background-color: var(--color-background);
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+}
+
+/* Dark theme specific overrides */
+.dark {
+  .bg-white { background-color: var(--color-background) !important; }
+  .bg-gray-50 { background-color: var(--color-surface) !important; }
+  .bg-gray-100 { background-color: var(--color-surface) !important; }
+  .bg-gray-800 { background-color: var(--color-surface) !important; }
+  .bg-gray-900 { background-color: var(--color-background) !important; }
+  
+  .text-white { color: var(--color-text) !important; }
+  .text-gray-900 { color: var(--color-text) !important; }
+  .text-gray-100 { color: var(--color-text) !important; }
+  .text-gray-300 { color: var(--color-muted) !important; }
+  .text-gray-400 { color: var(--color-muted) !important; }
+  
+  .border-gray-700 { border-color: var(--color-border) !important; }
+  .border-gray-600 { border-color: var(--color-border) !important; }
+}
+
+/* Theme transition animations */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.15s;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce), .reduce-motion {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Utility classes for direct theme variable usage */
+.bg-theme-primary { background-color: var(--color-primary); }
+.bg-theme-secondary { background-color: var(--color-secondary); }
+.bg-theme-accent { background-color: var(--color-accent); }
+.bg-theme-background { background-color: var(--color-background); }
+.bg-theme-surface { background-color: var(--color-surface); }
+
+.text-theme-primary { color: var(--color-primary); }
+.text-theme-secondary { color: var(--color-secondary); }
+.text-theme-accent { color: var(--color-accent); }
+.text-theme-text { color: var(--color-text); }
+.text-theme-muted { color: var(--color-muted); }
+
+.border-theme-primary { border-color: var(--color-primary); }
+.border-theme-border { border-color: var(--color-border); }
 
 /* Print Styles */
 @media print {
   .no-print {
     @apply hidden;
-  }
-}
-
-/* Reduced Motion */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
   }
 }

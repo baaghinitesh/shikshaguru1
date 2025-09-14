@@ -35,14 +35,14 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
   ];
 
   return (
-    <header className={cn('bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-800', className)}>
+    <header className={cn('header bg-theme-background border-b border-theme-border', className)}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center">
-              <BookOpen className="w-8 h-8 text-primary-600" />
-              <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
+              <BookOpen className="w-8 h-8 text-theme-primary" />
+              <span className="ml-2 text-xl font-bold text-theme-text">
                 ShikshaGuru
               </span>
             </Link>
@@ -68,7 +68,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
             <div className="hidden md:flex flex-1 max-w-lg mx-8">
               <div className="relative w-full">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-gray-400" />
+                  <Search className="h-5 w-5 text-theme-muted" />
                 </div>
                 <input
                   type="text"
@@ -102,26 +102,26 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
                     className="p-2 flex items-center space-x-2"
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                   >
-                    <div className="w-8 h-8 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center">
-                      <User className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                    <div className="w-8 h-8 bg-theme-surface rounded-full flex items-center justify-center border border-theme-border">
+                      <User className="w-5 h-5 text-theme-primary" />
                     </div>
                     {!isMobile && (
                       <>
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <span className="text-sm font-medium text-theme-text">
                           {user.name}
                         </span>
-                        <ChevronDown className="w-4 h-4 text-gray-400" />
+                        <ChevronDown className="w-4 h-4 text-theme-muted" />
                       </>
                     )}
                   </Button>
 
                   {/* User Dropdown Menu */}
                   {isUserMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
+                    <div className="absolute right-0 mt-2 w-48 bg-theme-background border border-theme-border rounded-md shadow-lg z-50">
                       <div className="py-1">
                         <Link
                           to="/dashboard"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          className="flex items-center px-4 py-2 text-sm text-theme-text hover:bg-theme-surface"
                           onClick={() => setIsUserMenuOpen(false)}
                         >
                           <User className="w-4 h-4 mr-3" />
@@ -129,7 +129,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
                         </Link>
                         <Link
                           to="/settings"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          className="flex items-center px-4 py-2 text-sm text-theme-text hover:bg-theme-surface"
                           onClick={() => setIsUserMenuOpen(false)}
                         >
                           <Settings className="w-4 h-4 mr-3" />
@@ -140,7 +140,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
                             setIsUserMenuOpen(false);
                             handleLogout();
                           }}
-                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          className="flex items-center w-full px-4 py-2 text-sm text-theme-text hover:bg-theme-surface"
                         >
                           <LogOut className="w-4 h-4 mr-3" />
                           Logout

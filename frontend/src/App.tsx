@@ -19,17 +19,17 @@ const HomePage: React.FC = () => {
   const { user } = useAuth();
   const features = [
     {
-      icon: <Users className="w-8 h-8 text-primary-600" />,
+      icon: <Users className="w-8 h-8 text-theme-primary" />,
       title: 'Find Expert Tutors',
       description: 'Connect with qualified tutors across all subjects and skill levels.',
     },
     {
-      icon: <Zap className="w-8 h-8 text-primary-600" />,
+      icon: <Zap className="w-8 h-8 text-theme-primary" />,
       title: 'Real-time Learning',
       description: 'Interactive sessions with chat, video calls, and file sharing.',
     },
     {
-      icon: <Shield className="w-8 h-8 text-primary-600" />,
+      icon: <Shield className="w-8 h-8 text-theme-primary" />,
       title: 'Secure & Trusted',
       description: 'Verified tutors, secure payments, and guaranteed satisfaction.',
     },
@@ -57,15 +57,15 @@ const HomePage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-theme-surface">
       {/* Hero Section */}
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary-50 to-accent-50 dark:from-gray-800 dark:to-gray-900">
+      <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-theme-background border-b border-theme-border">
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+          <h1 className="text-4xl md:text-6xl font-bold text-theme-text mb-6">
             Learn from the{' '}
-            <span className="text-gradient">Best Tutors</span>
+            <span className="text-theme-primary">Best Tutors</span>
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
+          <p className="text-xl text-theme-muted mb-8 max-w-3xl mx-auto">
             ShikshaGuru connects students with expert tutors for personalized learning experiences. 
             Find your perfect tutor today and unlock your potential.
           </p>
@@ -94,10 +94,10 @@ const HomePage: React.FC = () => {
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-theme-text mb-4">
               Why Choose ShikshaGuru?
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            <p className="text-lg text-theme-muted max-w-2xl mx-auto">
               We provide a comprehensive platform that makes learning accessible, 
               effective, and enjoyable for everyone.
             </p>
@@ -122,13 +122,13 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-theme-background">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-theme-text mb-4">
               What Our Users Say
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300">
+            <p className="text-lg text-theme-muted">
               Hear from students, tutors, and parents who love ShikshaGuru
             </p>
           </div>
@@ -145,10 +145,10 @@ const HomePage: React.FC = () => {
                   "{testimonial.content}"
                 </Card.Content>
                 <div>
-                  <p className="font-semibold text-gray-900 dark:text-white">
+                  <p className="font-semibold text-theme-text">
                     {testimonial.name}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-theme-muted">
                     {testimonial.role}
                   </p>
                 </div>

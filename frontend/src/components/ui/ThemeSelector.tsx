@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Palette, Settings, Sun, Moon, Sparkles } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { cn } from '@/utils';
+import type { ThemeOption } from '@/types';
 import Button from './Button';
 import Modal from './Modal';
-
 
 interface ThemeSelectorProps {
   className?: string;
@@ -12,51 +12,38 @@ interface ThemeSelectorProps {
 
 const ThemeSelector: React.FC<ThemeSelectorProps> = ({ className }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'themes' | 'custom' | 'settings'>('themes');
+  const [activeTab, setActiveTab] = useState<'themes' | 'settings'>('themes');
   const { 
     theme, 
     themes, 
     setTheme, 
-    setCustomColors, 
     setFontSize, 
     setFontFamily, 
     toggleAnimations 
   } = useTheme();
 
-  const [customColors, setCustomColorsState] = useState({
-    primary: theme.customColors?.primary || '#3b82f6',
-    secondary: theme.customColors?.secondary || '#64748b',
-    accent: theme.customColors?.accent || '#f59e0b',
-    background: theme.customColors?.background || '#ffffff',
-    text: theme.customColors?.text || '#1f2937',
-  });
-
-  const handleCustomColorChange = (colorKey: string, value: string) => {
-    const newColors = { ...customColors, [colorKey]: value };
-    setCustomColorsState(newColors);
-    setCustomColors(newColors);
+  const handleThemeSelect = (themeId: string) => {
+    setTheme(themeId);
+    // Close modal after a brief delay to show visual feedback
+    setTimeout(() => {
+      setIsOpen(false);
+    }, 300);
   };
 
-  const themesByCategory = {
-    light: themes.filter(t => t.category === 'light'),
-    dark: themes.filter(t => t.category === 'dark'),
-    colorful: themes.filter(t => t.category === 'colorful'),
-  };
-
-  const ThemePreview: React.FC<{ themeOption: any; isActive: boolean }> = ({ 
+  const ThemePreview: React.FC<{ themeOption: ThemeOption; isActive: boolean }> = ({ 
     themeOption, 
     isActive 
   }) => (
     <div
       className={cn(
-        'relative p-3 rounded-lg border-2 cursor-pointer transition-all duration-200',
+        'relative p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:scale-105',
         isActive 
-          ? 'border-primary-500 ring-2 ring-primary-200' 
-          : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'
+          ? 'border-theme-primary ring-2 ring-opacity-20 bg-theme-surface' 
+          : 'border-theme-border hover:border-theme-primary hover:shadow-md'
       )}
-      onClick={() => setTheme(themeOption.id)}
+      onClick={() => handleThemeSelect(themeOption.id)}
     >
-      <div className="flex items-center space-x-2 mb-2">
+      <div className="flex items-center space-x-2 mb-3">
         <div 
           className="w-4 h-4 rounded-full border"
           style={{ backgroundColor: themeOption.colors.primary }}
@@ -71,17 +58,17 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ className }) => {
         />
       </div>
       <div 
-        className="w-full h-8 rounded border mb-2"
+        className="w-full h-8 rounded border mb-3"
         style={{ backgroundColor: themeOption.colors.background }}
       />
-      <p className="text-xs font-medium text-gray-900 dark:text-white">
+      <h4 className="text-sm font-medium text-theme-text mb-1">
         {themeOption.name}
-      </p>
-      <p className="text-xs text-gray-500 dark:text-gray-400">
+      </h4>
+      <p className="text-xs text-theme-muted">
         {themeOption.preview}
       </p>
       {isActive && (
-        <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary-500 rounded-full flex items-center justify-center">
+        <div className="absolute -top-1 -right-1 w-5 h-5 bg-theme-primary rounded-full flex items-center justify-center">
           <div className="w-2 h-2 bg-white rounded-full" />
         </div>
       )}
@@ -94,7 +81,7 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ className }) => {
         variant="ghost"
         size="sm"
         onClick={() => setIsOpen(true)}
-        className={cn('p-2', className)}
+        className={cn('p-2 hover:bg-theme-surface', className)}
       >
         <Palette className="w-5 h-5" />
       </Button>
@@ -103,42 +90,31 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ className }) => {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         title="Theme Settings"
-        size="xl"
+        size="lg"
+        className="max-h-[90vh] overflow-y-auto"
       >
         <div className="space-y-6">
           {/* Tab Navigation */}
-          <div className="flex space-x-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+          <div className="flex space-x-1 bg-theme-surface p-1 rounded-lg border border-theme-border">
             <button
               onClick={() => setActiveTab('themes')}
               className={cn(
-                'flex-1 flex items-center justify-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
+                'flex-1 flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md transition-colors',
                 activeTab === 'themes'
-                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow'
-                  : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+                  ? 'bg-theme-primary text-white shadow'
+                  : 'text-theme-muted hover:text-theme-text'
               )}
             >
               <Sparkles className="w-4 h-4 mr-2" />
               Themes
             </button>
             <button
-              onClick={() => setActiveTab('custom')}
-              className={cn(
-                'flex-1 flex items-center justify-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
-                activeTab === 'custom'
-                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow'
-                  : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
-              )}
-            >
-              <Palette className="w-4 h-4 mr-2" />
-              Custom
-            </button>
-            <button
               onClick={() => setActiveTab('settings')}
               className={cn(
-                'flex-1 flex items-center justify-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
+                'flex-1 flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md transition-colors',
                 activeTab === 'settings'
-                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow'
-                  : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+                  ? 'bg-theme-primary text-white shadow'
+                  : 'text-theme-muted hover:text-theme-text'
               )}
             >
               <Settings className="w-4 h-4 mr-2" />
@@ -149,131 +125,21 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ className }) => {
           {/* Tab Content */}
           {activeTab === 'themes' && (
             <div className="space-y-6">
-              {/* Light Themes */}
-              <div>
-                <div className="flex items-center mb-3">
-                  <Sun className="w-4 h-4 mr-2 text-yellow-500" />
-                  <h4 className="text-sm font-medium text-gray-900 dark:text-white">
-                    Light Themes
-                  </h4>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  {themesByCategory.light.map((themeOption) => (
-                    <ThemePreview
-                      key={themeOption.id}
-                      themeOption={themeOption}
-                      isActive={theme.currentTheme === themeOption.id}
-                    />
-                  ))}
-                </div>
+              <div className="text-center">
+                <h3 className="text-lg font-semibold text-theme-text mb-2">Choose Your Theme</h3>
+                <p className="text-sm text-theme-muted">
+                  Select a theme to transform your entire app experience
+                </p>
               </div>
 
-              {/* Dark Themes */}
-              <div>
-                <div className="flex items-center mb-3">
-                  <Moon className="w-4 h-4 mr-2 text-blue-500" />
-                  <h4 className="text-sm font-medium text-gray-900 dark:text-white">
-                    Dark Themes
-                  </h4>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  {themesByCategory.dark.map((themeOption) => (
-                    <ThemePreview
-                      key={themeOption.id}
-                      themeOption={themeOption}
-                      isActive={theme.currentTheme === themeOption.id}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Colorful Themes */}
-              <div>
-                <div className="flex items-center mb-3">
-                  <Sparkles className="w-4 h-4 mr-2 text-purple-500" />
-                  <h4 className="text-sm font-medium text-gray-900 dark:text-white">
-                    Colorful Themes
-                  </h4>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  {themesByCategory.colorful.map((themeOption) => (
-                    <ThemePreview
-                      key={themeOption.id}
-                      themeOption={themeOption}
-                      isActive={theme.currentTheme === themeOption.id}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'custom' && (
-            <div className="space-y-4">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Create your own color scheme by adjusting the colors below.
-              </p>
-              
-              <div className="grid grid-cols-1 gap-4">
-                {Object.entries(customColors).map(([key, value]) => (
-                  <div key={key} className="flex items-center space-x-3">
-                    <label className="flex-1 text-sm font-medium text-gray-700 dark:text-gray-300 capitalize">
-                      {key}
-                    </label>
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="color"
-                        value={value}
-                        onChange={(e) => handleCustomColorChange(key, e.target.value)}
-                        className="w-10 h-10 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
-                      />
-                      <input
-                        type="text"
-                        value={value}
-                        onChange={(e) => handleCustomColorChange(key, e.target.value)}
-                        className="w-20 px-2 py-1 text-xs border border-gray-300 rounded dark:border-gray-600 dark:bg-gray-700"
-                      />
-                    </div>
-                  </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {themes.map((themeOption) => (
+                  <ThemePreview
+                    key={themeOption.id}
+                    themeOption={themeOption}
+                    isActive={theme.currentTheme === themeOption.id}
+                  />
                 ))}
-              </div>
-
-              <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <h5 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
-                  Preview
-                </h5>
-                <div className="space-y-2">
-                  <div 
-                    className="h-8 rounded flex items-center px-3"
-                    style={{ 
-                      backgroundColor: customColors.background,
-                      color: customColors.text,
-                      border: `1px solid ${customColors.primary}`
-                    }}
-                  >
-                    <span className="text-sm">Sample content with custom colors</span>
-                  </div>
-                  <div className="flex space-x-2">
-                    <div 
-                      className="px-3 py-1 rounded text-sm text-white"
-                      style={{ backgroundColor: customColors.primary }}
-                    >
-                      Primary
-                    </div>
-                    <div 
-                      className="px-3 py-1 rounded text-sm text-white"
-                      style={{ backgroundColor: customColors.secondary }}
-                    >
-                      Secondary
-                    </div>
-                    <div 
-                      className="px-3 py-1 rounded text-sm text-white"
-                      style={{ backgroundColor: customColors.accent }}
-                    >
-                      Accent
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           )}
@@ -282,19 +148,19 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ className }) => {
             <div className="space-y-6">
               {/* Font Size */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-theme-text mb-3">
                   Font Size
                 </label>
-                <div className="flex space-x-2">
+                <div className="flex gap-2">
                   {['small', 'medium', 'large'].map((size) => (
                     <button
                       key={size}
-                      onClick={() => setFontSize(size as any)}
+                      onClick={() => setFontSize(size as 'small' | 'medium' | 'large')}
                       className={cn(
-                        'px-3 py-2 text-sm rounded-md border transition-colors capitalize',
+                        'flex-1 px-4 py-2 text-sm rounded-md border transition-colors capitalize',
                         theme.fontSize === size
-                          ? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-900 dark:text-primary-300'
-                          : 'border-gray-300 hover:border-gray-400 dark:border-gray-600'
+                          ? 'border-theme-primary bg-theme-primary text-white'
+                          : 'border-theme-border bg-theme-surface text-theme-text hover:bg-theme-border'
                       )}
                     >
                       {size}
@@ -305,13 +171,13 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ className }) => {
 
               {/* Font Family */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-theme-text mb-3">
                   Font Family
                 </label>
                 <select
                   value={theme.fontFamily}
                   onChange={(e) => setFontFamily(e.target.value)}
-                  className="input"
+                  className="w-full px-3 py-2 bg-theme-background border border-theme-border rounded-md text-theme-text focus:outline-none focus:border-theme-primary"
                 >
                   <option value="Inter">Inter</option>
                   <option value="Roboto">Roboto</option>
@@ -326,21 +192,26 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ className }) => {
               <div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <label className="text-sm font-medium text-theme-text">
                       Animations
                     </label>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-theme-muted">
                       Enable smooth transitions and animations
                     </p>
                   </div>
                   <button
                     onClick={toggleAnimations}
                     className={cn(
-                      'theme-toggle',
-                      theme.animations ? 'bg-primary-600' : 'bg-gray-200 dark:bg-gray-700'
+                      'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
+                      theme.animations ? 'bg-theme-primary' : 'bg-theme-border'
                     )}
                   >
-                    <span className="theme-toggle-slider" />
+                    <span
+                      className={cn(
+                        'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+                        theme.animations ? 'translate-x-6' : 'translate-x-1'
+                      )}
+                    />
                   </button>
                 </div>
               </div>
