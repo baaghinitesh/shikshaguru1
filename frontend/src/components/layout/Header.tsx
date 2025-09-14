@@ -231,26 +231,82 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
             {/* Mobile Navigation */}
             <nav className="flex-1 px-4 py-6 space-y-4">
               {navigation.map((item) => (
-                <a
+                <Link
                   key={item.name}
-                  href={item.href}
+                  to={item.href}
                   className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {item.name}
-                </a>
+                </Link>
               ))}
+              
+              {/* Additional Mobile Links */}
+              <div className="border-t border-gray-200 dark:border-gray-800 pt-4">
+                <Link
+                  to="/"
+                  className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Home
+                </Link>
+                
+                {user && (
+                  <>
+                    <Link
+                      to="/dashboard"
+                      className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      to="/settings"
+                      className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Settings
+                    </Link>
+                  </>
+                )}
+              </div>
             </nav>
 
             {/* Mobile Footer */}
             <div className="p-4 border-t border-gray-200 dark:border-gray-800">
               <div className="space-y-3">
-                <Button variant="primary" className="w-full">
-                  Sign In
-                </Button>
-                <Button variant="outline" className="w-full">
-                  Get Started
-                </Button>
+                {user ? (
+                  <>
+                    <div className="text-center py-2">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Signed in as <span className="font-medium">{user.name}</span>
+                      </p>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        handleLogout();
+                      }}
+                    >
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Button variant="primary" className="w-full">
+                        Sign In
+                      </Button>
+                    </Link>
+                    <Link to="/register" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Button variant="outline" className="w-full">
+                        Get Started
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>
