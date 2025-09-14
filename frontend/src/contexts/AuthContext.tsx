@@ -127,6 +127,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error: any) {
       dispatch({ type: 'SET_ERROR', payload: error.message });
       throw error;
+    } finally {
+      dispatch({ type: 'LOADING', payload: false });
     }
   };
 
@@ -140,6 +142,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error: any) {
       dispatch({ type: 'SET_ERROR', payload: error.message });
       throw error;
+    } finally {
+      dispatch({ type: 'LOADING', payload: false });
     }
   };
 

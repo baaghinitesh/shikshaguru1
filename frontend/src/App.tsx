@@ -239,17 +239,8 @@ function App() {
               } />
               
               {/* Authentication Routes */}
-              <Route path="/login" element={
-                <ProtectedRoute requireAuth={false}>
-                  <LoginPage />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/register" element={
-                <ProtectedRoute requireAuth={false}>
-                  <RegisterPage />
-                </ProtectedRoute>
-              } />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
               
               {/* Protected Routes */}
               <Route path="/dashboard" element={

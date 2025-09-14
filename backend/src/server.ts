@@ -32,7 +32,7 @@ const io = new Server(server, {
   cors: {
     origin: process.env.NODE_ENV === 'production' 
       ? ['https://shikshaguru.com'] 
-      : ['http://localhost:3000', /.*\.clackypaas\.com$/],
+      : ['http://localhost:3000', 'http://localhost:3001', /.*\.clackypaas\.com$/],
     methods: ['GET', 'POST'],
     credentials: true
   },
@@ -65,7 +65,7 @@ app.use('/api/', limiter);
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? ['https://shikshaguru.com'] 
-    : ['http://localhost:3000', /.*\.clackypaas\.com$/],
+    : ['http://localhost:3000', 'http://localhost:3001', /.*\.clackypaas\.com$/],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
