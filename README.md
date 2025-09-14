@@ -7,7 +7,7 @@ The template for ClackyAI
 Install dependencies:
 
 * postgresql
-
+add
     ```bash
     $ brew install postgresql
     ```
