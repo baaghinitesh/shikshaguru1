@@ -84,13 +84,88 @@ app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 // Static files
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
+// API root endpoint
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Welcome to ShikshaGuru API',
+    version: '1.0.0',
+    timestamp: new Date().toISOString(),
+    documentation: {
+      health: '/health',
+      endpoints: {
+        auth: '/api/auth',
+        users: '/api/users',
+        jobs: '/api/jobs',
+        chat: '/api/chat',
+        reviews: '/api/reviews',
+        admin: '/api/admin'
+      }
+    },
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({
     success: true,
     message: 'ShikshaGuru API is running!',
     timestamp: new Date().toISOString(),
-    version: '1.0.0'
+    version: '1.0.0',
+    uptime: process.uptime(),
+    memory: process.memoryUsage(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// API documentation endpoint
+app.get('/api', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'ShikshaGuru API Documentation',
+    version: '1.0.0',
+    endpoints: {
+      authentication: {
+        base: '/api/auth',
+        routes: {
+          'POST /api/auth/register': 'Register a new user',
+          'POST /api/auth/login': 'Login user',
+          'POST /api/auth/logout': 'Logout user',
+          'GET /api/auth/me': 'Get current user profile',
+          'POST /api/auth/refresh-token': 'Refresh access token',
+          'POST /api/auth/forgot-password': 'Request password reset',
+          'POST /api/auth/reset-password/:token': 'Reset password with token',
+          'PUT /api/auth/password': 'Change password',
+          'GET /api/auth/verify-email/:token': 'Verify email address',
+          'POST /api/auth/resend-verification': 'Resend verification email'
+        }
+      },
+      users: {
+        base: '/api/users',
+        description: 'User profile and management endpoints'
+      },
+      jobs: {
+        base: '/api/jobs',
+        description: 'Job posting and application endpoints'
+      },
+      chat: {
+        base: '/api/chat',
+        description: 'Real-time chat and messaging endpoints'
+      },
+      reviews: {
+        base: '/api/reviews',
+        description: 'Review and rating system endpoints'
+      },
+      admin: {
+        base: '/api/admin',
+        description: 'Administrative endpoints (admin only)'
+      }
+    },
+    status: {
+      health: '/health',
+      root: '/'
+    }
   });
 });
 
