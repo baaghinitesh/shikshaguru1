@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Menu, X, Search, Bell, User, BookOpen } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Menu, X, Search, Bell, User, BookOpen, LogOut, Settings, ChevronDown } from 'lucide-react';
 import { cn } from '@/utils';
 import { useBreakpoint } from '@/contexts/ThemeContext';
+import { useAuth } from '@/contexts/AuthContext';
 import Button from '@/components/ui/Button';
 import ThemeSelector from '@/components/ui/ThemeSelector';
 
@@ -11,7 +13,19 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ className }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { isMobile } = useBreakpoint();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   const navigation = [
     { name: 'Find Tutors', href: '/tutors' },
@@ -26,25 +40,25 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <div className="flex-shrink-0 flex items-center">
+            <Link to="/" className="flex-shrink-0 flex items-center">
               <BookOpen className="w-8 h-8 text-primary-600" />
               <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
                 ShikshaGuru
               </span>
-            </div>
+            </Link>
           </div>
 
           {/* Desktop Navigation */}
           {!isMobile && (
             <nav className="hidden md:flex space-x-8">
               {navigation.map((item) => (
-                <a
+                <Link
                   key={item.name}
-                  href={item.href}
+                  to={item.href}
                   className="nav-link"
                 >
                   {item.name}
-                </a>
+                </Link>
               ))}
             </nav>
           )}
@@ -70,20 +84,87 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
             {/* Theme Selector */}
             <ThemeSelector />
 
-            {/* Notifications */}
-            <Button variant="ghost" size="sm" className="p-2 relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                3
-              </span>
-            </Button>
+            {user ? (
+              <>
+                {/* Notifications - only show when logged in */}
+                <Button variant="ghost" size="sm" className="p-2 relative">
+                  <Bell className="w-5 h-5" />
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                    0
+                  </span>
+                </Button>
 
-            {/* User Menu */}
-            <div className="relative">
-              <Button variant="ghost" size="sm" className="p-2">
-                <User className="w-5 h-5" />
-              </Button>
-            </div>
+                {/* User Menu */}
+                <div className="relative">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="p-2 flex items-center space-x-2"
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  >
+                    <div className="w-8 h-8 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center">
+                      <User className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                    </div>
+                    {!isMobile && (
+                      <>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {user.name}
+                        </span>
+                        <ChevronDown className="w-4 h-4 text-gray-400" />
+                      </>
+                    )}
+                  </Button>
+
+                  {/* User Dropdown Menu */}
+                  {isUserMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
+                      <div className="py-1">
+                        <Link
+                          to="/dashboard"
+                          className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          <User className="w-4 h-4 mr-3" />
+                          Dashboard
+                        </Link>
+                        <Link
+                          to="/settings"
+                          className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          <Settings className="w-4 h-4 mr-3" />
+                          Settings
+                        </Link>
+                        <button
+                          onClick={() => {
+                            setIsUserMenuOpen(false);
+                            handleLogout();
+                          }}
+                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                          <LogOut className="w-4 h-4 mr-3" />
+                          Logout
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              /* Login/Register buttons for non-authenticated users */
+              <div className="flex items-center space-x-2">
+                <Link to="/login">
+                  <Button variant="ghost" size="sm">
+                    Login
+                  </Button>
+                </Link>
+                <Link to="/register">
+                  <Button size="sm">
+                    Sign Up
+                  </Button>
+                </Link>
+              </div>
+            )}
 
             {/* Mobile menu button */}
             {isMobile && (
@@ -131,12 +212,12 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
           <div className="flex flex-col h-full">
             {/* Mobile Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
-              <div className="flex items-center">
+              <Link to="/" className="flex items-center">
                 <BookOpen className="w-8 h-8 text-primary-600" />
                 <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
                   ShikshaGuru
                 </span>
-              </div>
+              </Link>
               <Button
                 variant="ghost"
                 size="sm"
