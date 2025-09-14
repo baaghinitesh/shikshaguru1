@@ -3,7 +3,9 @@ import type { User, ApiResponse, LoginFormData, RegisterFormData } from '@/types
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: 'http://localhost:5001/api',
+  baseURL: window.location.hostname === 'localhost' 
+    ? 'http://localhost:5001/api'
+    : `http://${window.location.hostname}:5001/api`,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -35,7 +37,10 @@ api.interceptors.response.use(
       try {
         const refreshToken = localStorage.getItem('refreshToken');
         if (refreshToken) {
-          const response = await axios.post('http://localhost:5001/api/auth/refresh-token', {
+          const response = await axios.post(
+            window.location.hostname === 'localhost' 
+              ? 'http://localhost:5001/api/auth/refresh-token'
+              : `http://${window.location.hostname}:5001/api/auth/refresh-token`, {
             refreshToken,
           });
           
@@ -203,7 +208,9 @@ class AuthService {
       }
 
       const response = await axios.post<ApiResponse<{ accessToken: string }>>(
-        'http://localhost:5001/api/auth/refresh-token',
+        window.location.hostname === 'localhost' 
+          ? 'http://localhost:5001/api/auth/refresh-token'
+          : `http://${window.location.hostname}:5001/api/auth/refresh-token`,
         { refreshToken }
       );
 
