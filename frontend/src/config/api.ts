@@ -13,16 +13,11 @@ const getApiBaseURL = (): string => {
   // Try multiple API URL strategies
   const strategies = [];
   
-  // Strategy 1: Clacky Preview Environment
+  // Strategy 1: Clacky Preview Environment - Use relative URLs with Vite proxy
   if (hostname.includes('clackypaas.com')) {
-    // Extract the preview ID from hostname like: 3001-1da9b5ab82d5-web.clackypaas.com
-    const match = hostname.match(/^3001-([a-f0-9]+)-web\.clackypaas\.com$/);
-    if (match) {
-      const previewId = match[1];
-      strategies.push(`https://5001-${previewId}-web.clackypaas.com/api`);
-    }
-    // Fallback for clacky environment
-    strategies.push(`${protocol}//${hostname.replace('3001-', '5001-')}/api`);
+    // In Clacky preview, use relative URLs that will be proxied by Vite dev server
+    strategies.push('/api');
+    console.log('🔄 Clacky preview environment detected, using Vite proxy');
   }
   
   // Strategy 2: For local Clacky container environment
@@ -53,14 +48,11 @@ export const testApiConnectivity = async (): Promise<string> => {
   
   const strategies = [];
   
-  // Strategy 1: Clacky Preview Environment
+  // Strategy 1: Clacky Preview Environment - Use relative URLs with Vite proxy
   if (hostname.includes('clackypaas.com')) {
-    const match = hostname.match(/^3001-([a-f0-9]+)-web\.clackypaas\.com$/);
-    if (match) {
-      const previewId = match[1];
-      strategies.push(`https://5001-${previewId}-web.clackypaas.com`);
-    }
-    strategies.push(`${protocol}//${hostname.replace('3001-', '5001-')}`);
+    // In Clacky preview, test the proxied endpoints
+    strategies.push(`${protocol}//${hostname}`);
+    console.log('🔄 Clacky preview environment detected, testing proxied endpoints');
   }
   
   // Strategy 2: Local Clacky container
