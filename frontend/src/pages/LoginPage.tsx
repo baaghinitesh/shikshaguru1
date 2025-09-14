@@ -17,10 +17,11 @@ const LoginPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Login Form and Debug */}
-        <div className="grid md:grid-cols-2 gap-8">
-          <LoginForm />
-
+        {/* Login Form */}
+        <div className="flex justify-center">
+          <div className="w-full max-w-md">
+            <LoginForm />
+          </div>
         </div>
       </div>
     </div>
