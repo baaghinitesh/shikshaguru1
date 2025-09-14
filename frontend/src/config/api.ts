@@ -38,67 +38,11 @@ const getApiBaseURL = (): string => {
   return apiUrl;
 };
 
-// Also create a function to test connectivity
-export const testApiConnectivity = async (): Promise<string> => {
-  const hostname = window.location.hostname;
-  const protocol = window.location.protocol;
-  
-  const strategies = [];
-  
-  // Strategy 1: Clacky Preview Environment - Test direct backend URL
-  if (hostname.includes('clackypaas.com')) {
-    // Extract the preview ID from hostname like: 3001-1da9b5ab82d5-web.clackypaas.com
-    const match = hostname.match(/^3001-([a-f0-9]+)-web\.clackypaas\.com$/);
-    if (match) {
-      const previewId = match[1];
-      strategies.push(`https://5001-${previewId}-web.clackypaas.com`);
 
-    }
-    // Also test the proxied version through frontend
-    strategies.push(`${protocol}//${hostname}`);
-  }
-  
-  // Strategy 2: Local Clacky container
-  strategies.push('http://172.17.0.45:5001');
-  
-  // Strategy 3: Generic hostname approach
-  if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-    strategies.push(`${protocol}//${hostname}:5001`);
-  }
-  
-  // Strategy 4: Localhost fallback
-  strategies.push('http://localhost:5001');
-  
-  for (const baseUrl of strategies) {
-    try {
-
-      const response = await fetch(`${baseUrl}/health`, { 
-        method: 'GET',
-        mode: 'cors',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      if (response.ok) {
-
-        return `${baseUrl}/api`;
-      }
-    } catch (error) {
-
-    }
-  }
-  
-  throw new Error('No working API URL found');
-};
 
 export const API_BASE_URL = getApiBaseURL();
 
-// Initialize connectivity test
-testApiConnectivity().then(workingUrl => {
 
-}).catch(error => {
-  console.error('API connectivity check failed:', error);
-});
 export const API_ENDPOINTS = {
   AUTH: {
     REGISTER: '/auth/register',

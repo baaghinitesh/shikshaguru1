@@ -1,7 +1,7 @@
 import React from 'react';
 import { BookOpen } from 'lucide-react';
 import LoginForm from '@/components/auth/LoginForm';
-import ApiTest from '@/components/debug/ApiTest';
+
 
 const LoginPage: React.FC = () => {
   return (
@@ -20,7 +20,7 @@ const LoginPage: React.FC = () => {
         {/* Login Form and Debug */}
         <div className="grid md:grid-cols-2 gap-8">
           <LoginForm />
-          <ApiTest />
+
         </div>
       </div>
     </div>

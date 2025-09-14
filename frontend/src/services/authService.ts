@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { User, ApiResponse, LoginFormData, RegisterFormData } from '@/types';
-import { API_BASE_URL, testApiConnectivity } from '@/config/api';
+import { API_BASE_URL } from '@/config/api';
 
 // Create axios instance with base configuration
 let currentApiUrl = API_BASE_URL;
@@ -12,21 +12,7 @@ const api = axios.create({
   },
 });
 
-// Function to update API base URL dynamically
-const updateApiBaseUrl = async () => {
-  try {
-    const workingUrl = await testApiConnectivity();
-    if (workingUrl !== currentApiUrl) {
-      currentApiUrl = workingUrl;
-      api.defaults.baseURL = workingUrl;
-    }
-  } catch (error) {
-    console.error('Failed to find working API URL:', error);
-  }
-};
 
-// Test connectivity on service initialization
-updateApiBaseUrl();
 
 // Request interceptor to add auth token
 api.interceptors.request.use(
@@ -107,8 +93,7 @@ class AuthService {
 
     
     try {
-      // Ensure we have the best API URL before making request
-      await updateApiBaseUrl();
+
 
       
       const requestPayload = {
@@ -140,32 +125,7 @@ class AuthService {
     } catch (error: any) {
       console.error('Registration error:', error);
       
-      // If network error, try to find working API URL and retry
-      if (error.code === 'NETWORK_ERROR' || error.message.includes('Network Error')) {
 
-        await updateApiBaseUrl();
-        
-        // Retry once with new URL
-        try {
-
-          const retryResponse = await api.post<ApiResponse<AuthResponse>>('/auth/register', {
-            name: data.name,
-            email: data.email,
-            password: data.password,
-            role: data.role,
-          });
-          
-          if (retryResponse.data.success && retryResponse.data.data) {
-            const { accessToken, refreshToken } = retryResponse.data.data;
-            localStorage.setItem('accessToken', accessToken);
-            localStorage.setItem('refreshToken', refreshToken);
-
-            return retryResponse.data.data;
-          }
-        } catch (retryError: any) {
-          console.error('Registration retry failed:', retryError);
-        }
-      }
       
       if (error.response?.data?.message) {
         throw new Error(error.response.data.message);
@@ -184,8 +144,7 @@ class AuthService {
 
     
     try {
-      // Ensure we have the best API URL before making request
-      await updateApiBaseUrl();
+
 
       
       const requestPayload = {
@@ -215,30 +174,7 @@ class AuthService {
     } catch (error: any) {
       console.error('Login error:', error);
       
-      // If network error, try to find working API URL and retry
-      if (error.code === 'NETWORK_ERROR' || error.message.includes('Network Error')) {
 
-        await updateApiBaseUrl();
-        
-        // Retry once with new URL
-        try {
-
-          const retryResponse = await api.post<ApiResponse<AuthResponse>>('/auth/login', {
-            email: data.email,
-            password: data.password,
-          });
-          
-          if (retryResponse.data.success && retryResponse.data.data) {
-            const { accessToken, refreshToken } = retryResponse.data.data;
-            localStorage.setItem('accessToken', accessToken);
-            localStorage.setItem('refreshToken', refreshToken);
-
-            return retryResponse.data.data;
-          }
-        } catch (retryError: any) {
-          console.error('Login retry failed:', retryError);
-        }
-      }
       
       if (error.response?.data?.message) {
         throw new Error(error.response.data.message);
