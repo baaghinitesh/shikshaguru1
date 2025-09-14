@@ -26,8 +26,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = '' }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string>('');
 
-  // Get the redirect path from location state or default to dashboard
-  const from = (location.state as any)?.from?.pathname || '/dashboard';
+  // Get the redirect path from location state or default to home page
+  const from = (location.state as any)?.from?.pathname || '/';
 
   const validateForm = (): boolean => {
     const newErrors: Partial<LoginFormData> = {};

@@ -1,11 +1,13 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { User, GraduationCap, BookOpen, Calendar, MessageCircle, Settings, LogOut } from 'lucide-react';
+import { User, GraduationCap, BookOpen, Calendar, MessageCircle, Settings, LogOut, Home, Search, Briefcase, Info, HelpCircle } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 
 const DashboardPage: React.FC = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   if (!user) {
     return (
@@ -42,15 +44,26 @@ const DashboardPage: React.FC = () => {
               <div className="text-sm text-gray-600 dark:text-gray-300">
                 Welcome, {user.name}
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleLogout}
-                className="flex items-center"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </Button>
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate('/')}
+                  className="flex items-center"
+                >
+                  <Home className="w-4 h-4 mr-2" />
+                  Home
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleLogout}
+                  className="flex items-center"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -60,12 +73,34 @@ const DashboardPage: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Dashboard
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            Welcome to your ShikshaGuru {user.role} dashboard
-          </p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                Dashboard
+              </h1>
+              <p className="text-gray-600 dark:text-gray-300">
+                Welcome to your ShikshaGuru {user.role} dashboard
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => navigate('/tutors')}
+                className="flex items-center"
+              >
+                <Search className="w-4 h-4 mr-2" />
+                Find Tutors
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => navigate('/jobs')}
+                className="flex items-center"
+              >
+                <Briefcase className="w-4 h-4 mr-2" />
+                Browse Jobs
+              </Button>
+            </div>
+          </div>
         </div>
 
         {/* User Profile Card */}
@@ -173,38 +208,93 @@ const DashboardPage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {user.role === 'teacher' ? (
               <>
-                <Button className="w-full">
-                  Create New Class
+                <Button className="w-full" onClick={() => navigate('/jobs')}>
+                  <Briefcase className="w-4 h-4 mr-2" />
+                  Find Teaching Jobs
                 </Button>
                 <Button variant="outline" className="w-full">
+                  <User className="w-4 h-4 mr-2" />
                   View Students
                 </Button>
                 <Button variant="outline" className="w-full">
+                  <Calendar className="w-4 h-4 mr-2" />
                   Schedule Session
                 </Button>
                 <Button variant="outline" className="w-full">
+                  <Settings className="w-4 h-4 mr-2" />
                   View Earnings
                 </Button>
               </>
             ) : (
               <>
-                <Button className="w-full">
+                <Button className="w-full" onClick={() => navigate('/tutors')}>
+                  <Search className="w-4 h-4 mr-2" />
                   Find a Tutor
                 </Button>
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" onClick={() => navigate('/tutors')}>
+                  <BookOpen className="w-4 h-4 mr-2" />
                   Browse Subjects
                 </Button>
                 <Button variant="outline" className="w-full">
+                  <Calendar className="w-4 h-4 mr-2" />
                   My Bookings
                 </Button>
                 <Button variant="outline" className="w-full">
-                  Study Materials
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  Messages
                 </Button>
               </>
             )}
           </div>
         </Card>
 
+        {/* Navigation Links */}
+        <Card padding="lg" className="mt-6">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+            Explore ShikshaGuru
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Button
+              variant="ghost"
+              className="w-full flex flex-col items-center py-6 h-auto"
+              onClick={() => navigate('/')}
+            >
+              <Home className="w-8 h-8 mb-2 text-blue-600" />
+              <span className="font-medium">Home</span>
+              <span className="text-xs text-gray-500 mt-1">Return to homepage</span>
+            </Button>
+            
+            <Button
+              variant="ghost"
+              className="w-full flex flex-col items-center py-6 h-auto"
+              onClick={() => navigate('/about')}
+            >
+              <Info className="w-8 h-8 mb-2 text-green-600" />
+              <span className="font-medium">About Us</span>
+              <span className="text-xs text-gray-500 mt-1">Learn more about us</span>
+            </Button>
+            
+            <Button
+              variant="ghost"
+              className="w-full flex flex-col items-center py-6 h-auto"
+              onClick={() => navigate('/how-it-works')}
+            >
+              <HelpCircle className="w-8 h-8 mb-2 text-purple-600" />
+              <span className="font-medium">How It Works</span>
+              <span className="text-xs text-gray-500 mt-1">Get started guide</span>
+            </Button>
+            
+            <Button
+              variant="ghost"
+              className="w-full flex flex-col items-center py-6 h-auto"
+            >
+              <Settings className="w-8 h-8 mb-2 text-orange-600" />
+              <span className="font-medium">Settings</span>
+              <span className="text-xs text-gray-500 mt-1">Manage your account</span>
+            </Button>
+          </div>
+        </Card>
+        
         {/* Recent Activity */}
         <Card padding="lg" className="mt-6">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
@@ -212,8 +302,23 @@ const DashboardPage: React.FC = () => {
           </h3>
           <div className="text-center py-8">
             <p className="text-gray-500 dark:text-gray-400">
-              No recent activity yet. Start by completing your profile!
+              No recent activity yet. Start by {user.role === 'teacher' ? 'finding teaching opportunities' : 'finding a tutor'}!
             </p>
+            <div className="mt-4 space-x-3">
+              <Button
+                size="sm"
+                onClick={() => navigate(user.role === 'teacher' ? '/jobs' : '/tutors')}
+              >
+                {user.role === 'teacher' ? 'Browse Jobs' : 'Find Tutors'}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/')}
+              >
+                Explore Platform
+              </Button>
+            </div>
           </div>
         </Card>
       </main>

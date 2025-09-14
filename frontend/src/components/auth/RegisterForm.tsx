@@ -120,8 +120,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, className = '' }
       if (onSuccess) {
         onSuccess();
       } else {
-        // Navigate to dashboard after successful registration
-        navigate('/dashboard', { replace: true });
+        // Navigate to home page after successful registration
+        navigate('/', { replace: true });
       }
     } catch (error: any) {
       setRegisterError(error.message || 'Registration failed. Please try again.');
