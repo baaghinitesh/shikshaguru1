@@ -16,11 +16,31 @@ export const ApiTest: React.FC = () => {
   }, []);
 
   const testConnectivity = async () => {
-    const testUrls = [
-      'http://172.17.0.45:5001',
-      `${window.location.protocol}//${window.location.hostname}:5001`,
-      'http://localhost:5001'
-    ];
+    const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
+    
+    const testUrls = [];
+    
+    // Strategy 1: Clacky Preview Environment
+    if (hostname.includes('clackypaas.com')) {
+      const match = hostname.match(/^3001-([a-f0-9]+)-web\.clackypaas\.com$/);
+      if (match) {
+        const previewId = match[1];
+        testUrls.push(`https://5001-${previewId}-web.clackypaas.com`);
+      }
+      testUrls.push(`${protocol}//${hostname.replace('3001-', '5001-')}`);
+    }
+    
+    // Strategy 2: Local container
+    testUrls.push('http://172.17.0.45:5001');
+    
+    // Strategy 3: Generic approach
+    if (hostname !== 'localhost' && !hostname.includes('clackypaas.com')) {
+      testUrls.push(`${protocol}//${hostname}:5001`);
+    }
+    
+    // Strategy 4: Localhost
+    testUrls.push('http://localhost:5001');
 
     // Initialize all as testing
     setApiStatuses(testUrls.map(url => ({ url, status: 'testing' })));
@@ -85,11 +105,18 @@ export const ApiTest: React.FC = () => {
       
       <div className="space-y-2">
         <div className="text-xs text-gray-600">
-          <strong>Current URL:</strong> {currentWorkingUrl || 'None working'}
+          <strong>Working API:</strong> {currentWorkingUrl || 'None working'}
         </div>
         
         <div className="text-xs text-gray-600">
           <strong>Frontend:</strong> {window.location.origin}
+        </div>
+        
+        <div className="text-xs text-gray-600">
+          <strong>Expected Backend:</strong> {window.location.hostname.includes('clackypaas.com') 
+            ? `https://${window.location.hostname.replace('3001-', '5001-')}` 
+            : 'http://172.17.0.45:5001'
+          }
         </div>
         
         <div className="border-t pt-2">

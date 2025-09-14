@@ -13,20 +13,26 @@ const getApiBaseURL = (): string => {
   // Try multiple API URL strategies
   const strategies = [];
   
-  // Strategy 1: Use exact hostname with port 5001
-  if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-    strategies.push(`${protocol}//${hostname}:5001/api`);
+  // Strategy 1: Clacky Preview Environment
+  if (hostname.includes('clackypaas.com')) {
+    // Extract the preview ID from hostname like: 3001-1da9b5ab82d5-web.clackypaas.com
+    const match = hostname.match(/^3001-([a-f0-9]+)-web\.clackypaas\.com$/);
+    if (match) {
+      const previewId = match[1];
+      strategies.push(`https://5001-${previewId}-web.clackypaas.com/api`);
+    }
+    // Fallback for clacky environment
+    strategies.push(`${protocol}//${hostname.replace('3001-', '5001-')}/api`);
   }
   
-  // Strategy 2: For Clacky environment, try network IP
+  // Strategy 2: For local Clacky container environment
   if (hostname.includes('172.17.') || hostname.includes('clacky')) {
     strategies.push('http://172.17.0.45:5001/api');
   }
   
-  // Strategy 3: Use relative URL (let browser handle it)
-  if (port === '3001' || port === '3000') {
-    const backendPort = port === '3001' ? '5001' : '5001';
-    strategies.push(`${protocol}//${hostname}:${backendPort}/api`);
+  // Strategy 3: Use exact hostname with port 5001 (for other non-localhost)
+  if (hostname !== 'localhost' && hostname !== '127.0.0.1' && !hostname.includes('clackypaas.com')) {
+    strategies.push(`${protocol}//${hostname}:5001/api`);
   }
   
   // Strategy 4: Default localhost for development
@@ -42,25 +48,48 @@ const getApiBaseURL = (): string => {
 
 // Also create a function to test connectivity
 export const testApiConnectivity = async (): Promise<string> => {
-  const strategies = [
-    'http://172.17.0.45:5001/api',
-    `${window.location.protocol}//${window.location.hostname}:5001/api`,
-    'http://localhost:5001/api'
-  ];
+  const hostname = window.location.hostname;
+  const protocol = window.location.protocol;
   
-  for (const url of strategies) {
+  const strategies = [];
+  
+  // Strategy 1: Clacky Preview Environment
+  if (hostname.includes('clackypaas.com')) {
+    const match = hostname.match(/^3001-([a-f0-9]+)-web\.clackypaas\.com$/);
+    if (match) {
+      const previewId = match[1];
+      strategies.push(`https://5001-${previewId}-web.clackypaas.com`);
+    }
+    strategies.push(`${protocol}//${hostname.replace('3001-', '5001-')}`);
+  }
+  
+  // Strategy 2: Local Clacky container
+  strategies.push('http://172.17.0.45:5001');
+  
+  // Strategy 3: Generic hostname approach
+  if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+    strategies.push(`${protocol}//${hostname}:5001`);
+  }
+  
+  // Strategy 4: Localhost fallback
+  strategies.push('http://localhost:5001');
+  
+  for (const baseUrl of strategies) {
     try {
-      console.log('Testing API URL:', url);
-      const response = await fetch(`${url.replace('/api', '')}/health`, { 
+      console.log('Testing API URL:', baseUrl);
+      const response = await fetch(`${baseUrl}/health`, { 
         method: 'GET',
-        mode: 'cors'
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
       if (response.ok) {
-        console.log('✅ API URL works:', url);
-        return url;
+        console.log('✅ API URL works:', baseUrl);
+        return `${baseUrl}/api`;
       }
     } catch (error) {
-      console.log('❌ API URL failed:', url, error);
+      console.log('❌ API URL failed:', baseUrl, error);
     }
   }
   
@@ -71,9 +100,15 @@ export const API_BASE_URL = getApiBaseURL();
 
 // Initialize connectivity test
 testApiConnectivity().then(workingUrl => {
-  console.log('Confirmed working API URL:', workingUrl);
+  console.log('🎯 Confirmed working API URL:', workingUrl);
 }).catch(error => {
-  console.error('No API connectivity found:', error);
+  console.error('❌ No API connectivity found:', error);
+  console.log('🔍 Current environment details:', {
+    hostname: window.location.hostname,
+    protocol: window.location.protocol,
+    port: window.location.port,
+    href: window.location.href
+  });
 });
 export const API_ENDPOINTS = {
   AUTH: {
