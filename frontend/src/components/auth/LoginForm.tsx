@@ -5,7 +5,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
 import { useAuth } from '@/contexts/AuthContext';
-import { LoginFormData } from '@/types';
+import type { LoginFormData } from '@/types';
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -120,7 +120,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = '' }) => {
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <Input
-                id="email"
+                // id="email"
                 type="email"
                 placeholder="Enter your email"
                 value={formData.email}
@@ -140,7 +140,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = '' }) => {
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <Input
-                id="password"
+                // id="password"
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Enter your password"
                 value={formData.password}

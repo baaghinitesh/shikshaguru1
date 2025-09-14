@@ -7,8 +7,9 @@ export default defineConfig({
   plugins: [react()],
   server: {
     allowedHosts: ['.clackypaas.com'],
-    port: 3000,
-    host: true,
+    port: 3001,
+    host: '0.0.0.0',
+    strictPort: false,
   },
   resolve: {
     alias: {

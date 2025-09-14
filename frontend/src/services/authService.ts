@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { User, ApiResponse, LoginFormData, RegisterFormData } from '@/types';
+import type { User, ApiResponse, LoginFormData, RegisterFormData } from '@/types';
 
 // Create axios instance with base configuration
 const api = axios.create({
@@ -93,7 +93,7 @@ class AuthService {
       });
 
       if (response.data.success && response.data.data) {
-        const { accessToken, refreshToken, user } = response.data.data;
+        const { accessToken, refreshToken } = response.data.data;
         
         // Store tokens
         localStorage.setItem('accessToken', accessToken);
@@ -125,7 +125,7 @@ class AuthService {
       });
 
       if (response.data.success && response.data.data) {
-        const { accessToken, refreshToken, user } = response.data.data;
+        const { accessToken, refreshToken } = response.data.data;
         
         // Store tokens
         localStorage.setItem('accessToken', accessToken);

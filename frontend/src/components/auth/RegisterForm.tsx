@@ -5,7 +5,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
 import { useAuth } from '@/contexts/AuthContext';
-import { RegisterFormData } from '@/types';
+import type { RegisterFormData } from '@/types';
 
 interface RegisterFormProps {
   onSuccess?: () => void;
@@ -258,7 +258,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, className = '' }
             <div className="relative">
               <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <Input
-                id="name"
+                // id="name"
                 type="text"
                 placeholder="Enter your full name"
                 value={formData.name}
@@ -278,7 +278,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, className = '' }
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <Input
-                id="email"
+                // id="email"
                 type="email"
                 placeholder="Enter your email"
                 value={formData.email}
@@ -298,7 +298,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, className = '' }
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <Input
-                id="password"
+                // id="password"
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Create a strong password"
                 value={formData.password}
@@ -331,7 +331,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, className = '' }
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <Input
-                id="confirmPassword"
+                // id="confirmPassword"
                 type={showConfirmPassword ? 'text' : 'password'}
                 placeholder="Confirm your password"
                 value={formData.confirmPassword}

@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
-import { User, AuthContextType, RegisterFormData, ProfileFormData, ThemePreference } from '@/types';
+import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import type { ReactNode } from 'react';
+import type { User, AuthContextType, RegisterFormData, ProfileFormData, ThemePreference } from '@/types';
 import { authService } from '@/services/authService';
 
 // Auth State Interface
