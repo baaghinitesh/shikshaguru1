@@ -10,7 +10,7 @@ import DashboardPage from '@/pages/DashboardPage';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import ThemeSelector from '@/components/ui/ThemeSelector';
-import ApiTest from '@/components/debug/ApiTest';
+
 import { BookOpen, Users, Zap, Shield, Star, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -226,7 +226,7 @@ function App() {
       <AuthProvider>
         <Router>
           <div className="App min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
-            <ApiTest />
+
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={

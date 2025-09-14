@@ -4,12 +4,6 @@ const getApiBaseURL = (): string => {
   const protocol = window.location.protocol;
   const port = window.location.port;
   
-  // Debug logging
-  console.log('Current hostname:', hostname);
-  console.log('Current protocol:', protocol);
-  console.log('Current port:', port);
-  console.log('Current href:', window.location.href);
-  
   // Try multiple API URL strategies
   const strategies = [];
   
@@ -20,7 +14,6 @@ const getApiBaseURL = (): string => {
     if (match) {
       const previewId = match[1];
       strategies.push(`https://5001-${previewId}-web.clackypaas.com/api`);
-      console.log('🎯 Clacky preview environment detected, using direct backend URL');
     }
     // Fallback: Use Vite proxy as backup
     strategies.push('/api');
@@ -41,8 +34,6 @@ const getApiBaseURL = (): string => {
   
   // Use the first strategy
   const apiUrl = strategies[0];
-  console.log('Available strategies:', strategies);
-  console.log('Using API URL:', apiUrl);
   
   return apiUrl;
 };
@@ -61,7 +52,7 @@ export const testApiConnectivity = async (): Promise<string> => {
     if (match) {
       const previewId = match[1];
       strategies.push(`https://5001-${previewId}-web.clackypaas.com`);
-      console.log('🎯 Testing direct Clacky backend URL');
+
     }
     // Also test the proxied version through frontend
     strategies.push(`${protocol}//${hostname}`);
@@ -80,7 +71,7 @@ export const testApiConnectivity = async (): Promise<string> => {
   
   for (const baseUrl of strategies) {
     try {
-      console.log('Testing API URL:', baseUrl);
+
       const response = await fetch(`${baseUrl}/health`, { 
         method: 'GET',
         mode: 'cors',
@@ -89,11 +80,11 @@ export const testApiConnectivity = async (): Promise<string> => {
         }
       });
       if (response.ok) {
-        console.log('✅ API URL works:', baseUrl);
+
         return `${baseUrl}/api`;
       }
     } catch (error) {
-      console.log('❌ API URL failed:', baseUrl, error);
+
     }
   }
   
@@ -104,15 +95,9 @@ export const API_BASE_URL = getApiBaseURL();
 
 // Initialize connectivity test
 testApiConnectivity().then(workingUrl => {
-  console.log('🎯 Confirmed working API URL:', workingUrl);
+
 }).catch(error => {
-  console.error('❌ No API connectivity found:', error);
-  console.log('🔍 Current environment details:', {
-    hostname: window.location.hostname,
-    protocol: window.location.protocol,
-    port: window.location.port,
-    href: window.location.href
-  });
+  console.error('API connectivity check failed:', error);
 });
 export const API_ENDPOINTS = {
   AUTH: {
